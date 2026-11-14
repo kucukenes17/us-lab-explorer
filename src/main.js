@@ -1,3 +1,5 @@
+import { createFireExperience } from './fire.js';
+import { GTAOPass } from 'three/addons/postprocessing/GTAOPass.js';
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
@@ -38,7 +40,7 @@ const reducedMotion=matchMedia('(prefers-reduced-motion: reduce)');
 const touch=matchMedia('(pointer: coarse)').matches;
 const compact=()=>touch||innerWidth<=760;
 const keys=new Set();const held=new Set();
-const meshes=[];const parts=[];const byName=new Map();let metadata,renderer,composer,outline,camera,scene;
+const meshes=[];const parts=[];const byName=new Map();let metadata,renderer,composer,outline,camera,scene,ao,fire;
 let lastFrame=performance.now(),hoverTime=0,toastTimer,hoverPoint=new THREE.Vector3();
 const raycaster=new THREE.Raycaster(),pointer=new THREE.Vector2(),moveRay=new THREE.Raycaster();
 const velocity=new THREE.Vector3(),desired=new THREE.Vector3();
@@ -87,8 +89,8 @@ document.addEventListener('fullscreenchange',()=>$('fullscreen-button').setAttri
 function enter(){if(!state.ready)return;state.entered=true;$('welcome').hidden=true;$('hud').hidden=false;$('explore-hint').hidden=false;setRoute(!compact());renderer.domElement.focus({preventScroll:true});}
 $('enter-button').onclick=enter;
 function setRoute(visible){state.route=visible;$('route').hidden=!visible||!state.entered;$('route-button').setAttribute('aria-pressed',String(visible));if(visible)$('inventory').hidden=true;}
-$('route-button').onclick=()=>{if(compact()&&!state.route)closeSelection();setRoute(!state.route);};
-function showInventory(){if(!state.ready)return;setRoute(false);if(compact())closeSelection();$('inventory').hidden=false;renderInventory();$('part-search').focus();}
+$('route-button').onclick=()=>{fire?.close();if(compact()&&!state.route)closeSelection();setRoute(!state.route);};
+function showInventory(){if(!state.ready)return;fire?.close();setRoute(false);if(compact())closeSelection();$('inventory').hidden=false;renderInventory();$('part-search').focus();}
 $('inventory-button').onclick=showInventory;$('inventory-close').onclick=()=>{$('inventory').hidden=true;setRoute(true);};
 $('part-search').addEventListener('input',e=>{state.query=e.target.value.toLocaleLowerCase('tr');renderInventory();});
 document.querySelectorAll('[data-filter]').forEach(b=>b.onclick=()=>{state.filter=b.dataset.filter;document.querySelectorAll('[data-filter]').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));renderInventory();});
@@ -130,11 +132,11 @@ $('quality-button').onclick=()=>{state.quality=state.quality==='high'?'balanced'
 const moveCodes={KeyW:'forward',ArrowUp:'forward',KeyS:'back',ArrowDown:'back',KeyA:'left',ArrowLeft:'left',KeyD:'right',ArrowRight:'right',KeyQ:'down',KeyE:'up'};
 window.addEventListener('keydown',e=>{
  if(!state.entered||modalOpen())return;
- if(e.code==='Escape'){closeSelection();$('inventory').hidden=true;stopMovement();state.travel=null;renderer.domElement.focus({preventScroll:true});return;}
+ if(e.code==='Escape'){fire?.close();closeSelection();$('inventory').hidden=true;stopMovement();state.travel=null;renderer.domElement.focus({preventScroll:true});return;}
  if(/INPUT|TEXTAREA|SELECT/.test(document.activeElement?.tagName))return;
  if(moveCodes[e.code]){e.preventDefault();keys.add(moveCodes[e.code]);state.travel=null;}
  if(e.code==='KeyR'&&!e.repeat)home();
- if(e.code==='Escape'){closeSelection();$('inventory').hidden=true;stopMovement();state.travel=null;}
+ if(e.code==='Escape'){fire?.close();closeSelection();$('inventory').hidden=true;stopMovement();state.travel=null;}
 });
 window.addEventListener('keyup',e=>{if(moveCodes[e.code])keys.delete(moveCodes[e.code]);});
 window.addEventListener('blur',stopMovement);document.addEventListener('visibilitychange',()=>{stopMovement();lastFrame=performance.now();});
@@ -182,27 +184,36 @@ function updateMotion(dt){
  for(const b of document.querySelectorAll('[data-move]'))b.classList.toggle('pressed',pressedKey(b.dataset.move));
 }
 function pressedKey(k){return keys.has(k)||held.has(k);}
-function resize(){if(!renderer)return;const w=innerWidth,h=innerHeight;const dpr=Math.min(devicePixelRatio,state.quality==='high'?1.65:1);renderer.setPixelRatio(dpr);renderer.setSize(w,h);composer.setPixelRatio(dpr);composer.setSize(w,h);camera.aspect=w/h;camera.updateProjectionMatrix();}
+function resize(){if(!renderer)return;if(ao)ao.enabled=state.quality==='high'&&!fire?.active;const w=innerWidth,h=innerHeight;const dpr=Math.min(devicePixelRatio,state.quality==='high'?1.65:1);renderer.setPixelRatio(dpr);renderer.setSize(w,h);composer.setPixelRatio(dpr);composer.setSize(w,h);camera.aspect=w/h;camera.updateProjectionMatrix();}
 window.addEventListener('resize',resize);
 
-function frame(now){requestAnimationFrame(frame);const dt=Math.min((now-lastFrame)/1000,.045);lastFrame=now;if(document.hidden||!state.ready)return;updateMotion(dt);
+function frame(now){requestAnimationFrame(frame);const elapsed=(now-lastFrame)/1000;const dt=Math.min(elapsed,.045);lastFrame=now;if(document.hidden||!state.ready)return;updateMotion(dt);
  if(state.selected&&state.entered){const p=state.selected.userData.center.clone().project(camera);const visible=p.z>-1&&p.z<1&&Math.abs(p.x)<1&&Math.abs(p.y)<1;$('selection-pin').hidden=!visible;if(visible){$('selection-pin').style.left=`${(p.x*.5+.5)*innerWidth}px`;$('selection-pin').style.top=`${(-p.y*.5+.5)*innerHeight}px`;}}
- composer.render();
+ fire?.update(elapsed,camera);composer.render();
 }
 
 async function init(){
  try{
-  renderer=new THREE.WebGLRenderer({antialias:true,alpha:false,powerPreference:'high-performance'});renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=.95;renderer.setClearColor(0x1a2933);
+  renderer=new THREE.WebGLRenderer({antialias:true,alpha:false,powerPreference:'high-performance'});renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=.88;renderer.setClearColor(0x1a2933);
   renderer.domElement.tabIndex=0;renderer.domElement.setAttribute('aria-label','3D sahne. Sürükleyerek bak, WASD ile hareket et, parçaya tıklayarak seç.');$('viewport').append(renderer.domElement);
   renderer.domElement.addEventListener('webglcontextlost',e=>{e.preventDefault();stopMovement();showError('Grafik bağlantısı kesildi. Yeniden yükleyerek devam edebilirsin.');});
   scene=new THREE.Scene();scene.background=new THREE.Color(0x13222e);camera=new THREE.PerspectiveCamera(68,innerWidth/innerHeight,.035,45);camera.position.copy(initialPosition);camera.rotation.set(0,-Math.PI/2,0,'YXZ');
-  const pmrem=new THREE.PMREMGenerator(renderer);const room=new RoomEnvironment();scene.environment=pmrem.fromScene(room,.04).texture;scene.environmentIntensity=.32;room.dispose();pmrem.dispose();
-  scene.add(new THREE.HemisphereLight(0xf2f8ff,0x8698a5,.75));scene.add(new THREE.AmbientLight(0xffffff,.22));
+  const pmrem=new THREE.PMREMGenerator(renderer);const room=new RoomEnvironment();scene.environment=pmrem.fromScene(room,.04).texture;scene.environmentIntensity=.48;room.dispose();pmrem.dispose();
+  scene.add(new THREE.HemisphereLight(0xf2f8ff,0x8698a5,.55));scene.add(new THREE.AmbientLight(0xffffff,.12));
   for(const x of [-2.7,-1.35,0,1.35,2.7]){const light=new THREE.PointLight(0xf6f6ec,1.5,4,1.5);light.position.set(x,.72,0);scene.add(light);}
   const fill=new THREE.PointLight(0xdceeff,.7,5,1);fill.position.set(-2.8,0,0);scene.add(fill);
-  composer=new EffectComposer(renderer);composer.addPass(new RenderPass(scene,camera));outline=new OutlinePass(new THREE.Vector2(innerWidth,innerHeight),scene,camera);outline.edgeStrength=3;outline.edgeGlow=.1;outline.edgeThickness=1;outline.visibleEdgeColor.set('#efbc64');outline.hiddenEdgeColor.set('#665235');outline.pulsePeriod=0;composer.addPass(outline);composer.addPass(new OutputPass());resize();
+  composer=new EffectComposer(renderer);composer.addPass(new RenderPass(scene,camera));ao=new GTAOPass(scene,camera,innerWidth,innerHeight,undefined,{radius:.16,thickness:.35,distanceExponent:1});ao.blendIntensity=.55;composer.addPass(ao);outline=new OutlinePass(new THREE.Vector2(innerWidth,innerHeight),scene,camera);outline.edgeStrength=3;outline.edgeGlow=.1;outline.edgeThickness=1;outline.visibleEdgeColor.set('#efbc64');outline.hiddenEdgeColor.set('#665235');outline.pulsePeriod=0;composer.addPass(outline);composer.addPass(new OutputPass());resize();
   const metaResponse=await fetch('./assets/us-lab-metadata.json');if(!metaResponse.ok)throw new Error('Model bilgisi yüklenemedi.');metadata=await metaResponse.json();
-  const gltf=await new GLTFLoader().loadAsync('./assets/us-lab.glb',e=>{if(e.total){const percent=Math.round(e.loaded/e.total*93);$('load-progress').style.width=`${percent}%`;$('load-status').textContent=`US Lab iç mekânı yükleniyor · %${percent}`;}});
+  const assetResponse=await fetch('./assets/us-lab.asset.json');if(!assetResponse.ok)throw Error('Model manifesti yüklenemedi.');const asset=await assetResponse.json();
+  const loaded=asset.parts.map(()=>0);
+  const chunks=await Promise.all(asset.parts.map(async(part,index)=>{
+   const response=await fetch('./assets/'+part.file);if(!response.ok)throw Error('Model dosyası yüklenemedi.');
+   const reader=response.body.getReader();const blocks=[];while(true){const {value,done}=await reader.read();if(done)break;blocks.push(value);loaded[index]+=value.byteLength;const percent=Math.round(loaded.reduce((a,b)=>a+b,0)/asset.bytes*93);$('load-progress').style.width=`${percent}%`;$('load-status').textContent=`US Lab iç mekânı yükleniyor · %${percent}`;}
+   if(loaded[index]!==part.bytes)throw Error('Model dosyası eksik.');const bytes=new Uint8Array(loaded[index]);let offset=0;for(const b of blocks){bytes.set(b,offset);offset+=b.byteLength;}return bytes;
+  }));
+  const modelBytes=new Uint8Array(asset.bytes);let offset=0;for(const chunk of chunks){modelBytes.set(chunk,offset);offset+=chunk.byteLength;}
+  const gltf=await new GLTFLoader().parseAsync(modelBytes.buffer,'./assets/');
+
   const descriptions=new Map(metadata.items.map(i=>[i.name,i]));
   gltf.scene.updateMatrixWorld(true);
   gltf.scene.traverse(part=>{
@@ -210,12 +221,13 @@ async function init(){
    const meta=descriptions.get(name);part.userData.sourceName=name;part.userData.description=describe(name);part.userData.index=parts.length;part.userData.center=new THREE.Vector3(...meta.center);
    parts.push(part);byName.set(name,part);
    part.traverse(o=>{if(!o.isMesh)return;o.userData.part=part;meshes.push(o);o.frustumCulled=true;
-    const materials=Array.isArray(o.material)?o.material:[o.material];for(const mat of materials){if(mat.map)mat.map.anisotropy=Math.min(8,renderer.capabilities.getMaxAnisotropy());if(/Lights/i.test(name)&&mat.emissive)mat.emissiveIntensity=Math.min(mat.emissiveIntensity,1.3);}
+    const materials=Array.isArray(o.material)?o.material:[o.material];for(const mat of materials){if(mat.map)mat.map.anisotropy=Math.min(8,renderer.capabilities.getMaxAnisotropy());if(mat.emissive)mat.emissiveIntensity=Math.min(mat.emissiveIntensity,/Lights/i.test(name)?1.05:.55);}
    });
   });
   scene.add(gltf.scene);scene.updateMatrixWorld(true);camera.updateMatrixWorld(true);
   if(meshes.length<10)throw new Error('Model parçaları okunamadı.');
   $('part-count').textContent=String(parts.length);makeStops();setupPointer();$('load-progress').style.width='100%';$('load-status').textContent='Son ayrıntılar hazırlanıyor';
+  fire=createFireExperience({scene,enter,travelTo,stopMovement,hidePanels:()=>{closeSelection();setRoute(false);$('inventory').hidden=true;},onMode:active=>{document.body.classList.toggle('fire-mode',active);ao.enabled=!active&&state.quality==='high';}});
   await renderer.compileAsync(scene,camera);composer.render();state.ready=true;$('loading').hidden=true;$('welcome').hidden=false;requestAnimationFrame(frame);
   // A compact read-only status lets diagnostics verify the loaded asset without exposing controls.
   Object.defineProperty(window,'explorerStatus',{get:()=>({ready:state.ready,entered:state.entered,partCount:parts.length,meshCount:meshes.length,selected:state.selected?.userData.sourceName??null,position:camera.position.toArray(),quality:state.quality,triangles:renderer.info.render.triangles})});

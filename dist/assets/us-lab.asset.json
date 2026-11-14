@@ -1,0 +1,18 @@
+{
+  "bytes": 43951632,
+  "sha256": "e88bdbbbbfc68d72952930d2c1ce988c8bbedee60eaf617736e1eac215a37181",
+  "parts": [
+    {
+      "file": "us-lab.part1.bin",
+      "bytes": 15728640
+    },
+    {
+      "file": "us-lab.part2.bin",
+      "bytes": 15728640
+    },
+    {
+      "file": "us-lab.part3.bin",
+      "bytes": 12494352
+    }
+  ]
+}
