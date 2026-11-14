@@ -55,3 +55,8 @@ Görev metni; yanma araştırmalarını özetleyen, sıralayan ve yorumlayan bil
 ## Bu sürümün kontrolleri
 
 665 kayıt satırındaki5.320 sayısal alan özgün workbook XML değerleriyle eşleştirildi. Olay geçişlerinde akım/fan durumu ayrıca kontrol edildi. Yeni GLB'nin66 parçası ve tüm POSITION verileri önceki geometriyle birebir aynı. Tarayıcıda zaman atlama, olay ölçümleri, araştırma sıralaması ve küçük ekran panel erişimi kontrol edildi.43,95MB yüksek çözünürlüklü modelin ilk yüklemesi bağlantıya ve cihaza göre değişir.
+
+
+## Alev görünümü revizyonu
+
+Önceki kameraya dönük ışık katmanları kaldırıldı. Yerine numuneye bağlı üç boyutlu hacim içinde çizilen, kumaş üzerinde ilerleyen dalgalı bir yanma cephesi; dokuma, kömürleşme ve yüzeye bağlı kor noktaları eklendi. Perspektif değiştiğinde alev numunede kalır. Görsel referans NASA Saffire-I fotoğrafıdır: https://www.nasa.gov/image-article/fiberglass-composite/ . İlerleme hızı ve alev şekli sanatsal temsildir; fotoğraf/veri üzerinden kalibre edilmiş fizik modeli değildir.
