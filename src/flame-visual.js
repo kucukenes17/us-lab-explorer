@@ -50,18 +50,20 @@ export function createFlameVisual(scene,source){
      float h=p.y+.5;
      float ripple=.016*sin(p.z*27.)+.008*sin(p.z*65.);
      float n=fbm(vec3(p.x*24.-uClock*.6,p.y*15.,p.z*24.+uClock*.15));
-     float height=.55+.14*sin(p.z*23.+uClock*.5)+.12*n;
-     float lean=.21*h;
-     float waviness=(n-.5)*(.016+h*.09);
+     float tongues=noise(vec3(p.z*18.,uClock*.65,1.7));
+     float height=.27+.49*tongues+.12*sin(p.z*36.-uClock*1.3);
+     float lean=.24*h;
+     float waviness=(n-.5)*(.018+h*.15);
      float centre=uFront+ripple+lean+waviness;
-     float thickness=.014+.025*(1.-h/max(height,.001));
+     float thickness=.008+.018*(1.-h/max(height,.001));
      float sheet=max(0.,1.-abs(p.x-centre)/max(thickness,.006));
      float lateral=1.-smoothstep(.35,.40,abs(p.z));
      float top=1.-smoothstep(height-.1,height,h);
-     float density=pow(sheet,.75)*lateral*top*smoothstep(0.,.035,h)*uAmount;
-     float a=1.-exp(-density*stepSize*96.);if(!foundHit&&a>.005){firstHit=p;foundHit=true;}
-     vec3 tint=mix(vec3(.025,.10,.55),vec3(1.35,.23,.018),smoothstep(.025,.13,h));
-     tint=mix(tint,vec3(2.1,.95,.2),pow(sheet,5.)*.6);
+     float density=pow(sheet,.9)*lateral*top*smoothstep(0.,.025,h)*uAmount;
+     density*=mix(1.,smoothstep(.25,.62,n),smoothstep(.12,.65,h)*.65);
+     float a=1.-exp(-density*stepSize*57.);if(!foundHit&&a>.003){firstHit=p;foundHit=true;}
+     vec3 tint=mix(vec3(.025,.13,.62),vec3(1.7,.32,.028),smoothstep(.045,.22,h));
+     tint=mix(tint,vec3(2.2,1.1,.32),pow(sheet,5.)*.4*smoothstep(.10,.3,h));
      sum+=(1.-alpha)*tint*a;alpha+=(1.-alpha)*a;
      // A faint downstream plume follows the authored flow direction, not a universal upward axis.
      float smokeWindow=smoothstep(uFront+.10,uFront+.2,p.x)*(1.-smoothstep(.40,.5,p.x));

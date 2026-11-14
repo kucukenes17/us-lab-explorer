@@ -86,7 +86,7 @@ $('retry-button').onclick=()=>location.reload();
 $('fullscreen-button').onclick=async()=>{try {if(document.fullscreenElement)await document.exitFullscreen();else if(document.documentElement.requestFullscreen)await document.documentElement.requestFullscreen();else toast('Bu tarayıcı tam ekranı desteklemiyor.');}catch{toast('Tam ekran açılamadı; keşfe bu görünümde devam edebilirsin.');}};
 document.addEventListener('fullscreenchange',()=>$('fullscreen-button').setAttribute('aria-label',document.fullscreenElement?'Tam ekrandan çık':'Tam ekran'));
 
-function enter(){if(!state.ready)return;state.entered=true;$('welcome').hidden=true;$('hud').hidden=false;$('explore-hint').hidden=false;setRoute(!compact());renderer.domElement.focus({preventScroll:true});}
+function enter(){if(!state.ready)return;const first=!state.entered;state.entered=true;document.body.classList.add('entered');$('welcome').hidden=true;$('hud').hidden=false;$('explore-hint').hidden=false;if(first)setRoute(!compact());renderer.domElement.focus({preventScroll:true});}
 $('enter-button').onclick=enter;
 function setRoute(visible){state.route=visible;$('route').hidden=!visible||!state.entered;$('route-button').setAttribute('aria-pressed',String(visible));if(visible)$('inventory').hidden=true;}
 $('route-button').onclick=()=>{fire?.close();if(compact()&&!state.route)closeSelection();setRoute(!state.route);};
@@ -108,12 +108,17 @@ function makeStops(){
 function select(mesh){
  state.selected=mesh;state.hover=null;state.travel=null;stopMovement();$('hover-label').hidden=true;
  const d=mesh.userData.description;$('detail-title').textContent=d.title;$('detail-description').textContent=d.description;$('detail-category').textContent=d.category;$('detail-icon').innerHTML=icon(d.icon);$('detail-number').textContent=`USL / ${String(mesh.userData.index+1).padStart(2,'0')}`;$('detail-source').textContent=mesh.userData.sourceName;$('detail').hidden=false;
+ document.body.classList.add('part-selected');setRoute(false);$('inventory').hidden=true;
+ const related=/Wires|Bulkhead/i.test(mesh.userData.sourceName)?'Duman algılama araştırmaları':'Katı numuneler ve yanma davranışı';
+ $('detail-research-label').textContent=related;
+ $('detail-research').onclick=()=>fire.openCatalog(/Wires|Bulkhead/i.test(mesh.userData.sourceName)?'detection':'prevention');
+ $('detail-placement').onclick=()=>{fire.placeAt(mesh.userData.center.toArray(),d.title);closeSelection();};
  if(compact()){setRoute(false);$('inventory').hidden=true;}
  const stopIndex=stops.findIndex(s=>s.name===mesh.userData.sourceName);if(stopIndex>=0)state.visited.add(stopIndex);
  document.querySelectorAll('[data-stop]').forEach(b=>{b.classList.toggle('selected',Number(b.dataset.stop)===stopIndex);b.classList.toggle('visited',state.visited.has(Number(b.dataset.stop)));});
  $('visited-count').textContent=`${state.visited.size} / ${stops.length}`;updateOutline();document.querySelectorAll('[data-part]').forEach(b=>b.classList.toggle('selected',Number(b.dataset.part)===mesh.userData.index));
 }
-function closeSelection(){state.selected=null;state.hover=null;$('detail').hidden=true;$('selection-pin').hidden=true;document.querySelectorAll('[data-stop]').forEach(b=>b.classList.remove('selected'));updateOutline();}
+function closeSelection(){state.selected=null;state.hover=null;document.body.classList.remove('part-selected');$('detail').hidden=true;$('selection-pin').hidden=true;document.querySelectorAll('[data-stop]').forEach(b=>b.classList.remove('selected'));updateOutline();}
 $('detail-close').onclick=closeSelection;
 function updateOutline(){if(outline)outline.selectedObjects=state.selected?[state.selected]:state.hover?[state.hover]:[];}
 
@@ -155,15 +160,18 @@ function setupPointer(){
  canvas.addEventListener('pointerleave',()=>{if(!drag){state.hover=null;$('hover-label').hidden=true;updateOutline();}});
  canvas.addEventListener('contextmenu',e=>e.preventDefault());
  function pick(x,y,click){
-  if(modalOpen()||!state.ready)return;pointer.set(x/window.innerWidth*2-1,-y/window.innerHeight*2+1);raycaster.setFromCamera(pointer,camera);const hit=raycaster.intersectObjects(meshes,false)[0];
+  if(modalOpen()||!state.ready)return;const rect=canvas.getBoundingClientRect();pointer.set((x-rect.left)/rect.width*2-1,-(y-rect.top)/rect.height*2+1);raycaster.setFromCamera(pointer,camera);const hit=raycaster.intersectObjects(meshes,false)[0];
   if(hit){if(click){select(hit.object.userData.part);hoverPoint.copy(hit.point);}else{state.hover=hit.object.userData.part;$('hover-text').textContent=hit.object.userData.part.userData.description.title;$('hover-label').hidden=false;$('hover-label').style.left=`${Math.min(x+17,window.innerWidth-270)}px`;$('hover-label').style.top=`${Math.min(y+20,window.innerHeight-160)}px`;}}else{state.hover=null;$('hover-label').hidden=true;if(click)closeSelection();}updateOutline();
  }
 }
 
 function canMove(from,delta){
  if(delta.lengthSq()<1e-9)return true;
- moveRay.set(from,delta.clone().normalize());moveRay.far=delta.length()+.14;
- return moveRay.intersectObjects(meshes,false).length===0;
+ const direction=delta.clone().normalize();const perpendicular=new THREE.Vector3().crossVectors(direction,Math.abs(direction.y)<.9?new THREE.Vector3(0,1,0):new THREE.Vector3(1,0,0)).normalize().multiplyScalar(.09);
+ const perpendicular2=new THREE.Vector3().crossVectors(direction,perpendicular).normalize().multiplyScalar(.09);
+ moveRay.far=delta.length()+.14;
+ for(const offset of [new THREE.Vector3(),perpendicular,perpendicular.clone().negate(),perpendicular2,perpendicular2.clone().negate()]){moveRay.set(from.clone().add(offset),direction);if(moveRay.intersectObjects(meshes,false).length)return false;}
+ return true;
 }
 function updateMotion(dt){
  if(!state.entered||modalOpen())return;
@@ -184,11 +192,12 @@ function updateMotion(dt){
  for(const b of document.querySelectorAll('[data-move]'))b.classList.toggle('pressed',pressedKey(b.dataset.move));
 }
 function pressedKey(k){return keys.has(k)||held.has(k);}
-function resize(){if(!renderer)return;if(ao)ao.enabled=state.quality==='high'&&!fire?.active;const w=innerWidth,h=innerHeight;const dpr=Math.min(devicePixelRatio,state.quality==='high'?1.65:1);renderer.setPixelRatio(dpr);renderer.setSize(w,h);composer.setPixelRatio(dpr);composer.setSize(w,h);camera.aspect=w/h;camera.updateProjectionMatrix();}
+function resize(){if(!renderer||!composer)return;if(ao)ao.enabled=state.quality==='high'&&!fire?.active;const {width:w,height:h}=$('viewport').getBoundingClientRect();const dpr=Math.min(devicePixelRatio,state.quality==='high'?1.65:1);renderer.setPixelRatio(dpr);renderer.setSize(w,h);composer.setPixelRatio(dpr);composer.setSize(w,h);camera.aspect=w/h;camera.updateProjectionMatrix();}
 window.addEventListener('resize',resize);
+new ResizeObserver(resize).observe($('viewport'));
 
 function frame(now){requestAnimationFrame(frame);const elapsed=(now-lastFrame)/1000;const dt=Math.min(elapsed,.045);lastFrame=now;if(document.hidden||!state.ready)return;updateMotion(dt);
- if(state.selected&&state.entered){const p=state.selected.userData.center.clone().project(camera);const visible=p.z>-1&&p.z<1&&Math.abs(p.x)<1&&Math.abs(p.y)<1;$('selection-pin').hidden=!visible;if(visible){$('selection-pin').style.left=`${(p.x*.5+.5)*innerWidth}px`;$('selection-pin').style.top=`${(-p.y*.5+.5)*innerHeight}px`;}}
+ if(state.selected&&state.entered){const p=state.selected.userData.center.clone().project(camera);const rect=$('viewport').getBoundingClientRect();const visible=p.z>-1&&p.z<1&&Math.abs(p.x)<1&&Math.abs(p.y)<1;$('selection-pin').hidden=!visible;if(visible){$('selection-pin').style.left=`${rect.left+(p.x*.5+.5)*rect.width}px`;$('selection-pin').style.top=`${rect.top+(-p.y*.5+.5)*rect.height}px`;}}
  fire?.update(elapsed,camera);composer.render();
 }
 
@@ -197,7 +206,7 @@ async function init(){
   renderer=new THREE.WebGLRenderer({antialias:true,alpha:false,powerPreference:'high-performance'});renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=.88;renderer.setClearColor(0x1a2933);
   renderer.domElement.tabIndex=0;renderer.domElement.setAttribute('aria-label','3D sahne. Sürükleyerek bak, WASD ile hareket et, parçaya tıklayarak seç.');$('viewport').append(renderer.domElement);
   renderer.domElement.addEventListener('webglcontextlost',e=>{e.preventDefault();stopMovement();showError('Grafik bağlantısı kesildi. Yeniden yükleyerek devam edebilirsin.');});
-  scene=new THREE.Scene();scene.background=new THREE.Color(0x13222e);camera=new THREE.PerspectiveCamera(68,innerWidth/innerHeight,.035,45);camera.position.copy(initialPosition);camera.rotation.set(0,-Math.PI/2,0,'YXZ');
+  scene=new THREE.Scene();scene.background=new THREE.Color(0x13222e);camera=new THREE.PerspectiveCamera(68,innerWidth/innerHeight,.02,45);camera.position.copy(initialPosition);camera.rotation.set(0,-Math.PI/2,0,'YXZ');
   const pmrem=new THREE.PMREMGenerator(renderer);const room=new RoomEnvironment();scene.environment=pmrem.fromScene(room,.04).texture;scene.environmentIntensity=.48;room.dispose();pmrem.dispose();
   scene.add(new THREE.HemisphereLight(0xf2f8ff,0x8698a5,.55));scene.add(new THREE.AmbientLight(0xffffff,.12));
   for(const x of [-2.7,-1.35,0,1.35,2.7]){const light=new THREE.PointLight(0xf6f6ec,1.5,4,1.5);light.position.set(x,.72,0);scene.add(light);}
@@ -221,7 +230,12 @@ async function init(){
    const meta=descriptions.get(name);part.userData.sourceName=name;part.userData.description=describe(name);part.userData.index=parts.length;part.userData.center=new THREE.Vector3(...meta.center);
    parts.push(part);byName.set(name,part);
    part.traverse(o=>{if(!o.isMesh)return;o.userData.part=part;meshes.push(o);o.frustumCulled=true;
-    const materials=Array.isArray(o.material)?o.material:[o.material];for(const mat of materials){if(mat.map)mat.map.anisotropy=Math.min(8,renderer.capabilities.getMaxAnisotropy());if(mat.emissive)mat.emissiveIntensity=Math.min(mat.emissiveIntensity,/Lights/i.test(name)?1.05:.55);}
+    const materials=Array.isArray(o.material)?o.material:[o.material];for(const mat of materials){
+     // These atlases contain cutout masks, not translucent surfaces. BLEND makes
+     // entire rack groups sort by their origin and disappear behind each other.
+     if(/USLab_Racks_0[13]/i.test(mat.name)){mat.transparent=false;mat.alphaTest=.5;mat.depthWrite=true;mat.opacity=1;mat.needsUpdate=true;}
+     if(/Patches1/i.test(mat.name)){mat.transparent=false;mat.alphaTest=0;mat.depthWrite=true;mat.opacity=1;mat.needsUpdate=true;}
+     if(mat.map)mat.map.anisotropy=Math.min(8,renderer.capabilities.getMaxAnisotropy());if(mat.emissive)mat.emissiveIntensity=Math.min(mat.emissiveIntensity,/Lights/i.test(name)?1.05:.55);}
    });
   });
   scene.add(gltf.scene);scene.updateMatrixWorld(true);camera.updateMatrixWorld(true);
@@ -230,7 +244,7 @@ async function init(){
   fire=createFireExperience({scene,enter,travelTo,stopMovement,hidePanels:()=>{closeSelection();setRoute(false);$('inventory').hidden=true;},onMode:active=>{document.body.classList.toggle('fire-mode',active);ao.enabled=!active&&state.quality==='high';}});
   await renderer.compileAsync(scene,camera);composer.render();state.ready=true;$('loading').hidden=true;$('welcome').hidden=false;requestAnimationFrame(frame);
   // A compact read-only status lets diagnostics verify the loaded asset without exposing controls.
-  Object.defineProperty(window,'explorerStatus',{get:()=>({ready:state.ready,entered:state.entered,partCount:parts.length,meshCount:meshes.length,selected:state.selected?.userData.sourceName??null,position:camera.position.toArray(),quality:state.quality,triangles:renderer.info.render.triangles})});
+  Object.defineProperty(window,'explorerStatus',{get:()=>({ready:state.ready,entered:state.entered,partCount:parts.length,meshCount:meshes.length,selected:state.selected?.userData.sourceName??null,position:camera.position.toArray(),quality:state.quality,experiment:fire.status,materials:[...new Set(meshes.flatMap(m=>Array.isArray(m.material)?m.material:[m.material]))].map(m=>({name:m.name,transparent:m.transparent,alphaTest:m.alphaTest,depthWrite:m.depthWrite}))})});
  }catch(error){console.error('US Lab initialization:',error);showError(error.message?.includes('WebGL')?'Bu cihazda WebGL açılamadı. Donanım hızlandırması olan güncel bir tarayıcıyla deneyebilirsin.':'İç mekân yüklenemedi. Bağlantını kontrol edip yeniden deneyebilirsin.');}
 }
 function showError(message){$('loading').hidden=false;$('loading').querySelector('h1').textContent='Keşfe kısa bir ara.';$('load-status').textContent=message;$('retry-button').hidden=false;$('retry-button').style.marginTop='25px';}

@@ -1,80 +1,67 @@
 import { createFlameVisual } from './flame-visual.js';
+import { createCatalog, loadCatalog, escapeHTML as esc, conditionValue } from './catalog.js';
 import * as THREE from 'three';
-
 const $=id=>document.getElementById(id);
 const fmt=(n,d=1)=>Number.isFinite(n)?n.toLocaleString('tr-TR',{maximumFractionDigits:d,minimumFractionDigits:d}):'—';
 const time=t=>`${Math.floor(t/60).toString().padStart(2,'0')}:${Math.floor(t%60).toString().padStart(2,'0')}`;
-const investigations=[
- {id:'saffire',name:'Saffire-I',type:'Katı yakıt · kumaş',focus:['prevention'],place:'Cygnus · mikro yerçekimi',question:'Daha büyük bir kumaş numunesinde alev nasıl büyür?',conditions:'SIBAL kumaş; kontrollü hava akışı. Bu görünüm yalnızca Numune 1 kaydını içerir.',measure:'Termokupllar, O₂, CO₂, hava hızı, ateşleyici ve fan komutları.',limit:'US Lab yangınını veya başka malzemelerin yanmasını tahmin etmez.',source:'https://psi.nasa.gov/physci/repo/data/investigations/PSI-98',ready:true},
- {id:'bass',name:'BASS / BASS-II',type:'Katı yakıt · kumaş ve polimerler',focus:['prevention','suppression'],place:'ISS · Microgravity Science Glovebox',question:'Hava akışı ve deney koşulları katı yakıtın yanmasını nasıl değiştirir?',conditions:'Numune türü, geometrisi ve akış koşulları deneyden deneye değişir.',measure:'Alev görünümü, yayılma ve sönme davranışı.',limit:'Karşılaştırma yaparken numune ve test koşullarını eşleştirmek gerekir.',source:'https://psi.nasa.gov/physci/repo/data/investigations/PSI-25'},
- {id:'same',name:'SAME / SAME-R',type:'Duman ve aerosol',focus:['detection'],place:'ISS · mikro yerçekimi',question:'Farklı malzemelerin ürettiği duman nasıl ölçülür?',conditions:'Uzay aracında kullanılan malzemeler kontrollü biçimde ısıtılır.',measure:'Duman parçacıklarının boyutu, dağılımı ve cihaz tepkileri.',limit:'Bir sensör sinyali, doğrulanmış bir erken uyarı modeli anlamına gelmez.',source:'https://psi.nasa.gov/physci/repo/data/investigations/PSI-101'},
- {id:'flex',name:'FLEX',type:'Sıvı yakıt · damlacık',focus:['suppression'],place:'ISS · CIR / MDCA',question:'Gazlı söndürücüler ve atmosfer koşulları sönme sınırını nasıl etkiler?',conditions:'Yakıt damlacıkları; değişen oksijen, basınç ve söndürücü karışımları.',measure:'Yanma ve sönme sınırları, damlacık davranışı.',limit:'Damlacık deneyinin sonucu doğrudan bir kablo veya kumaşa aktarılamaz.',source:'https://psi.nasa.gov/physci/repo/data/investigations/PSI-69'}
-];
+const colors=['#c6803a','#39809b','#6d8b62','#9179a5'];
 
 export function createFireExperience({scene,enter,hidePanels,travelTo,onMode,stopMovement}){
- let active=false,playing=false,t=0,speed=5,data=null,pending=null,lastRow=-1,lastPhase='',visualTime=0;
- const source=new THREE.Vector3(-.18,-.22,-.33);
- const visual=createFlameVisual(scene,source);const group=visual.group;
-
- function phase(){return t<60.027?'Ateşleme öncesi':t<68.013?'Ateşleyici etkin':t<480.054?'Yanma evresi · temsili':'Fan kapalı · kayıt sürüyor';}
- function renderResearch(){
-  const focus=$('research-focus').value;
-  const ordered=[...investigations].sort((a,b)=>Number(b.focus.includes(focus))-Number(a.focus.includes(focus)));
-  $('research-cards').replaceChildren();
-  for(const inv of ordered){
-   const card=document.createElement('article');card.className='research-card';
-   const direct=focus==='all'||inv.focus.includes(focus);
-   card.innerHTML=`<div class="research-card-top"><span class="research-tag">${focus==='all'?inv.type:direct?'Doğrudan ilgili':'Tamamlayıcı'}</span><span>${inv.ready?'VERİ HAZIR':'KAYNAK REHBERİ'}</span></div><h3>${inv.name}</h3><p class="research-question">${inv.question}</p><dl><dt>Ortam</dt><dd>${inv.place}</dd><dt>Koşullar</dt><dd>${inv.conditions}</dd><dt>Ölçümler</dt><dd>${inv.measure}</dd></dl><p class="research-limit">${inv.limit}</p><a href="${inv.source}" target="_blank" rel="noopener noreferrer">NASA kaynağını incele ↗</a>`;
-   if(inv.ready){const b=document.createElement('button');b.className='primary';b.textContent='Gerçek kaydı aç →';b.onclick=()=>{$('research-dialog').close();open();};card.append(b);}
-   $('research-cards').append(card);
-  }
- }
- $('research-focus').onchange=renderResearch;
- $('research-button').onclick=()=>{playing=false;stopMovement();$('research-dialog').showModal();renderResearch();};
- $('research-close').onclick=()=>$('research-dialog').close();
- $('fire-button').onclick=()=>active?close():open();
- $('fire-close').onclick=close;
+ let active=false,playing=false,t=0,speed=5,data=null,record=null,rows=[],charts=[],lastRow=-1,request=0,records=[],currentRow=null;
+ const source=new THREE.Vector3(-.18,-.22,-.33),placement=source.clone();let placementLabel='Merkez · numune tepsisi';
+ const visual=createFlameVisual(scene,source),sampleGroup=new THREE.Group();scene.add(sampleGroup);sampleGroup.visible=false;
+ const tray=new THREE.Mesh(new THREE.BoxGeometry(.7,.014,.35),new THREE.MeshStandardMaterial({color:0x3d4c53,metalness:.65,roughness:.4}));tray.position.y=-.025;sampleGroup.add(tray);
+ const sampleMat=new THREE.MeshStandardMaterial({color:0xe4d6ba,roughness:.85,metalness:0});
+ const sample=new THREE.Mesh(new THREE.BoxGeometry(.52,.008,.22),sampleMat);sampleGroup.add(sample);
+ const wick=new THREE.Mesh(new THREE.CylinderGeometry(.012,.012,.12,14),new THREE.MeshStandardMaterial({color:0xd8c7a7}));wick.position.y=.06;sampleGroup.add(wick);
+ const heater=new THREE.Mesh(new THREE.TorusGeometry(.045,.004,6,32),new THREE.MeshStandardMaterial({color:0x665f55,emissive:0xd65214,emissiveIntensity:0,metalness:.6,roughness:.5}));heater.rotation.x=Math.PI/2;heater.position.y=.02;sampleGroup.add(heater);
+ const catalog=createCatalog({onSelect:r=>open(r),onOpen:()=>{playing=false;stopMovement();$('record-metadata').querySelector('video')?.pause();},onClose:()=>{}});
+ const expand=document.createElement('button');expand.id='scene-expand';expand.textContent='Sahneyi büyüt';expand.setAttribute('aria-expanded','false');expand.onclick=()=>{const wide=document.body.classList.toggle('expanded-scene');expand.textContent=wide?'Verileri aç':'Sahneyi büyüt';expand.setAttribute('aria-expanded',String(wide));};$('fire-context').append(expand);
+ $('research-button').onclick=()=>catalog.open();$('welcome-research').onclick=()=>catalog.open();
+ $('lab-button').onclick=()=>{close();enter();};$('fire-button').onclick=()=>active?close():open();$('fire-close').onclick=close;
+ $('experiment-select').onchange=e=>open(records.find(r=>r.id===e.target.value));
+ const tabs=['data','conditions','source'];
+ function setTab(name){for(const tab of tabs){const b=$('tab-'+tab);b.setAttribute('aria-selected',String(tab===name));b.tabIndex=tab===name?0:-1;$('record-'+tab).hidden=tab!==name;}if(name!=='data')$('record-metadata').querySelector('video')?.pause();}
+ for(const name of tabs){$('tab-'+name).onclick=()=>setTab(name);$('tab-'+name).onkeydown=e=>{if(!['ArrowRight','ArrowLeft'].includes(e.key))return;e.preventDefault();const next=tabs[(tabs.indexOf(name)+(e.key==='ArrowRight'?1:2))%3];setTab(next);$('tab-'+next).focus();};}
  $('fire-play').onclick=()=>{if(!data)return;if(t>=data.sampling.endElapsedS)t=0;playing=!playing;render();};
- $('fire-reset').onclick=()=>{playing=false;t=0;render();};
- $('fire-speed').onchange=e=>speed=Number(e.target.value);
- $('fire-range').oninput=e=>{t=Number(e.target.value);render();};
- $('fire-focus').onclick=focusCamera;
- $('fire-collapse').onclick=()=>{const r=$('fire-readings');r.hidden=!r.hidden;$('fire-panel').classList.toggle('folded',r.hidden);$('fire-collapse').textContent=r.hidden?'Grafikleri göster +':'Grafikleri gizle −';$('fire-collapse').setAttribute('aria-expanded',String(!r.hidden));};
- $('fire-visual-toggle').onchange=e=>{group.visible=active&&e.target.checked;};
- document.querySelectorAll('[data-fire-time]').forEach(b=>b.onclick=()=>{t=Number(b.dataset.fireTime);playing=false;render();});
- $('fire-download').onclick=()=>{
-  if(!data)return;const lines=[data.columns.map(c=>c.key).join(','),...data.rows.map(r=>r.join(','))];const url=URL.createObjectURL(new Blob([lines.join('\n')],{type:'text/csv;charset=utf-8'}));const a=document.createElement('a');a.href=url;a.download='Saffire-I-Sample1-nearest-original-1s.csv';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
- };
- function focusCamera(){travelTo([-1.05,.25,.35],[-.18,-.16,-.33]);}
- async function load(){
-  if(data)return;if(pending)return pending;
-  pending=(async()=>{const r=await fetch('./assets/saffire-scenario.json');if(!r.ok)throw Error('Kayıt yüklenemedi');data=await r.json();if(data.schemaVersion!==1||!data.rows?.length)throw Error('Kayıt biçimi okunamadı');$('fire-range').max=data.sampling.endElapsedS;buildCharts();$('fire-loading').hidden=true;$('fire-content').hidden=false;render();})().catch(()=>{pending=null;data=null;lastRow=-1;$('fire-content').hidden=true;$('fire-loading').hidden=false;$('fire-loading').textContent='Kayıt yüklenemedi. Paneli kapatıp yeniden açabilirsin.';});return pending;
+ $('fire-reset').onclick=()=>{playing=false;t=0;render();};$('fire-speed').onchange=e=>speed=Number(e.target.value);
+ $('fire-range').oninput=e=>{t=Number(e.target.value);playing=false;render();};$('fire-focus').onclick=focusCamera;
+ $('fire-visual-toggle').onchange=updateVisibility;
+ $('placement-select').onchange=e=>{const choices={center:[-.18,-.22,-.33],aft:[-1.75,-.22,-.33],forward:[1.75,-.22,-.33]};if(choices[e.target.value]){placement.fromArray(choices[e.target.value]);placementLabel=e.target.selectedOptions[0].text;applyPlacement();focusCamera();}};
+ $('fire-download').onclick=()=>{if(!data)return;const lines=[data.columns.map(c=>c.key).join(','),...rows.map(r=>r.join(','))];const url=URL.createObjectURL(new Blob([lines.join('\n')],{type:'text/csv;charset=utf-8'}));const a=document.createElement('a');a.href=url;a.download=`${record.id}-source-measurements.csv`;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);};
+ function applyPlacement(){visual.group.position.copy(placement).sub(source);sampleGroup.position.copy(placement);$('context-caption').textContent=`${placementLabel} · temsili yerleşim`;$('placement-select').title=placementLabel;}
+ function focusCamera(){travelTo([placement.x-.85,.22,.35],[placement.x,placement.y+.07,placement.z]);}
+ function updateVisibility(){const show=active&&$('fire-visual-toggle').checked;visual.group.visible=show&&record?.id==='saffire-i-sample1';sampleGroup.visible=show&&!!record&&record.id!=='saffire-i-sample1';}
+ async function ensureCatalog(){records=await loadCatalog();$('experiment-select').replaceChildren(...records.map(r=>new Option(r.title,r.id)));}
+ async function open(selected){
+  const token=++request;active=true;playing=false;enter();hidePanels();onMode(true);document.body.classList.remove('has-telemetry','expanded-scene');expand.textContent='Sahneyi büyüt';expand.setAttribute('aria-expanded','false');$('fire-panel').hidden=false;$('fire-context').hidden=false;$('fire-timeline').hidden=true;$('fire-button').setAttribute('aria-pressed','true');$('lab-button').setAttribute('aria-pressed','false');$('fire-loading').hidden=false;$('fire-loading').textContent='Kaynak kayıt yükleniyor…';$('fire-content').hidden=true;$('record-metadata').hidden=true;$('fire-download').hidden=true;$('record-metadata').querySelector('video')?.pause();data=null;rows=[];currentRow=null;lastRow=-1;t=0;updateVisibility();setTab('data');
+  try{if(!records.length)await ensureCatalog();if(token!==request)return;record=selected??record??records[0];$('experiment-select').value=record.id;$('record-title').textContent=record.experiment;$('context-title').textContent=`${record.material} · ${record.experiment}${record.testId?' / '+record.testId:''}`;
+   applyPlacement();configureSample();updateVisibility();renderConditions();renderSource();focusCamera();
+   if(record.telemetryFile){const response=await fetch('./assets/'+record.telemetryFile);if(!response.ok)throw Error('Ölçümler yüklenemedi');const result=await response.json();if(token!==request)return;if(result.schemaVersion!==1||!result.rows?.length)throw Error('Ölçüm biçimi hatalı');data=result;rows=data.rows;$('fire-range').max=data.sampling.endElapsedS;buildCharts();buildEvents();$('fire-content').hidden=false;$('fire-timeline').hidden=false;document.body.classList.add('has-telemetry');$('fire-download').hidden=false;$('record-intro').textContent=record.id==='same-r55'?'Isıtma, dedektör sinyalleri ve karıştırma fanının gerçek kaydı. Voltaj, duman yoğunluğu değildir.':'SIBAL numunesinin gerçek sensör ölçümleri. Alev yayılımı temsili animasyondur.';renderSource();render();}
+   else{renderMetadata();$('record-metadata').hidden=false;}
+   $('fire-loading').hidden=true;
+  }catch(e){if(token!==request)return;$('fire-loading').replaceChildren(document.createTextNode('Kayıt yüklenemedi. '));const b=document.createElement('button');b.textContent='Yeniden dene';b.className='secondary';b.onclick=()=>open(selected);$('fire-loading').append(b);$('fire-loading').hidden=false;}
  }
- function open(){
-  active=true;enter();hidePanels();onMode(true);group.visible=$('fire-visual-toggle').checked;$('fire-panel').hidden=false;$('fire-timeline').hidden=false;$('fire-context').hidden=false;$('fire-button').setAttribute('aria-pressed','true');focusCamera();load();
+ function close(){++request;active=false;playing=false;onMode(false);document.body.classList.remove('has-telemetry','expanded-scene');expand.textContent='Sahneyi büyüt';expand.setAttribute('aria-expanded','false');updateVisibility();$('fire-panel').hidden=true;$('fire-timeline').hidden=true;$('fire-context').hidden=true;$('fire-button').setAttribute('aria-pressed','false');$('lab-button').setAttribute('aria-pressed','true');$('record-metadata').querySelector('video')?.pause();}
+ function configureSample(){const candle=record.geometryType==='candle',same=record.id==='same-r55';sample.visible=!same;wick.visible=same||candle;heater.visible=same;sample.geometry.dispose();sample.geometry=candle?new THREE.CylinderGeometry(.055,.055,.15,40):new THREE.BoxGeometry(.52,.008,.22);sample.position.y=candle ? .075 : 0;wick.position.y=candle ? .18 : .06;sampleMat.color.set(record.material==='PMMA'?0xbcd4da:record.material==='Nomex III'?0xb8ac89:0xe4d6ba);heater.material.emissiveIntensity=0;}
+ function renderConditions(){
+  $('condition-list').innerHTML=`<div><dt>Deneyin gerçek ortamı</dt><dd>${esc(record.platform)}</dd></div><div><dt>Malzeme</dt><dd>${esc(record.materialOriginal)}</dd></div>${record.conditions.filter(c=>!['Numune','Malzeme'].includes(c.label)).map(c=>`<div><dt>${esc(c.label)}</dt><dd>${esc(conditionValue(c))}</dd></div>`).join('')}`;
  }
- function close(){active=false;playing=false;group.visible=false;onMode(false);$('fire-panel').hidden=true;$('fire-timeline').hidden=true;$('fire-context').hidden=true;$('fire-button').setAttribute('aria-pressed','false');}
- const charts=[{key:'sampleTempC',index:2,label:'Numune sıcaklığı · TC9',unit:'°C',color:'#df9f62',digits:1},{key:'plumeTempC',index:3,label:'Sıcak gaz bölgesi · TC3',unit:'°C',color:'#dfc585',digits:1},{key:'oxygenPct',index:4,label:'Oksijen sensörü',unit:'%',color:'#76b6d3',digits:3},{key:'co2Pct',index:5,label:'Karbondioksit sensörü',unit:'%',color:'#9dbf9e',digits:3}];
- function buildCharts(){
-  $('fire-charts').replaceChildren();
-  charts.forEach(c=>{
-   const col=data.columns.find(v=>v.key===c.key);const lo=col.originalRange[0],hi=col.originalRange[1],range=hi-lo||1;
-   const points=data.rows.map(r=>`${(r[0]/data.sampling.endElapsedS*264).toFixed(2)},${(55-(r[c.index]-lo)/range*48).toFixed(2)}`).join(' ');
-   const card=document.createElement('div');card.className='telemetry-card';card.style.setProperty('--trace',c.color);
-   card.innerHTML=`<div class="telemetry-heading"><span>${c.label}</span><strong id="value-${c.key}">—</strong></div><svg viewBox="0 0 264 62" role="img" aria-label="${c.label} zaman serisi"><path d="M0 7H264M0 31H264M0 55H264" class="chart-grid"/><polyline points="${points}" class="chart-line"/><line class="chart-cursor" x1="0" x2="0" y1="0" y2="62"/><circle class="chart-dot" r="3" cx="0" cy="55"/></svg><div class="chart-axis"><span>${fmt(lo,c.digits)}–${fmt(hi,c.digits)} ${c.unit}</span><span>0–660 s</span></div>`;
-   $('fire-charts').append(card);c.element=card;c.lo=lo;c.range=range;
-  });
+ function renderSource(){const s=data?.source??record.source;
+  $('source-content').innerHTML=`<span class="evidence-badge ${record.kind==='telemetry'?'series':'metadata'}">${record.kind==='telemetry'?'ÖZGÜN ÖLÇÜMLER':'ÖZGÜN DENEY TABLOSU'}</span><p>${esc(record.evidence.description)}</p><a href="${esc(record.sourceUrl)}" target="_blank" rel="noopener noreferrer">NASA PSI kaynak kaydı ↗</a>${s?.downloadUrl?`<a href="${esc(s.downloadUrl)}" target="_blank" rel="noopener noreferrer">Özgün veri dosyasını aç ↗</a>`:''}<h3>Bu kayıt neyi gösterir?</h3><ul>${record.limitations.map(l=>`<li>${esc(l)}</li>`).join('')}</ul>${s?`<details><summary>Dosya ve izlenebilirlik</summary><code>${esc(s.fileName)}</code>${s.sheet?`<p>Sayfa: ${esc(s.sheet)}</p>`:''}${s.csvRow?`<p>CSV satırı: ${s.csvRow}</p>`:''}${s.sha256?`<p>SHA-256</p><code>${s.sha256}</code>`:''}</details>`:''}`;
  }
- function render(){
-  if(!data)return;$('fire-range').value=t;$('fire-time').textContent=`${time(t)} / ${time(data.sampling.endElapsedS)}`;$('fire-play').textContent=playing?'Ⅱ Duraklat':'▶ Oynat';
-  const p=phase();if(p!==lastPhase){$('fire-phase').textContent=p;lastPhase=p;}
-  let lo=0,hi=data.rows.length-1;while(lo<hi){const m=(lo+hi)>>1;if(data.rows[m][0]<t)lo=m+1;else hi=m;}let rowIndex=lo;if(lo>0&&Math.abs(data.rows[lo-1][0]-t)<Math.abs(data.rows[lo][0]-t))rowIndex=lo-1;
-  const row=data.rows[rowIndex];const cursorX=t/data.sampling.endElapsedS*264;
-  for(const c of charts){c.element.querySelector('.chart-cursor').setAttribute('x1',cursorX);c.element.querySelector('.chart-cursor').setAttribute('x2',cursorX);c.element.querySelector('.chart-dot').setAttribute('cx',row[0]/data.sampling.endElapsedS*264);c.element.querySelector('.chart-dot').setAttribute('cy',55-(row[c.index]-c.lo)/c.range*48);if(lastRow!==rowIndex)$(`value-${c.key}`).textContent=`${fmt(row[c.index],c.digits)} ${c.unit}`;}
-  if(lastRow!==rowIndex){$('fire-air').textContent=`${fmt(row[6])} cm/s`;$('fire-current').textContent=`${fmt(row[7],3)} A`;$('fire-fan').textContent=row[8]===1?'Açık':'Kapalı';$('fire-sample').textContent=`Ölçüm: ${fmt(row[0],3)} s · Excel satırı ${row[1]}`;lastRow=rowIndex;}
+ function renderMetadata(){const video=record.media;
+  $('record-metadata').innerHTML=`<span class="evidence-badge ${video?'video':'metadata'}">${video?'NASA DENEY VİDEOSU':'DENEY KOŞULLARI'}</span>${video?`<video controls playsinline preload="metadata" aria-label="${esc(record.title)} NASA deney videosu" src="./assets/${esc(video.file)}"></video><p class="caption">${esc(video.caption??'B1 numune/test kimliği eşleşir; videonun tarih yazısı ile tablo tarihi farklıdır. Sensör zamanıyla eşleştirilmemiştir.')}</p>`:`<div class="sample-card"><span class="sample-symbol ${record.geometryType}"></span><h3>${esc(record.material)}</h3><p>${esc(record.materialOriginal)}</p></div>`}<p class="data-note">Bu kayıtta deney koşulları var. Sürekli sensör eğrisi bu pakete dahil değil; 3D görünüm numune biçimini gösterir.</p><dl class="condition-list">${record.conditions.map(c=>`<div><dt>${esc(c.label)}</dt><dd>${esc(conditionValue(c))}</dd></div>`).join('')}</dl><p class="caption">BASS fan/hava alanları kaynak gösterge notlarıdır; birimleri ve geçiş zamanları belirtilmemiştir.</p>`;
  }
- return {get active(){return active;},close,update(dt,camera){
-  if(!active)return;if(playing&&!document.querySelector('dialog[open]')){t=Math.min(t+dt*speed,data?.sampling.endElapsedS??0);if(data&&t>=data.sampling.endElapsedS)playing=false;render();}
-  visual.update(t);
- }};
+ function buildCharts(){charts=record.chartKeys.map((key,i)=>{const index=data.columns.findIndex(c=>c.key===key);return {...data.columns[index],index,color:colors[i],digits:key==='stsDetectorV'?6:key==='issScatterV'?3:key.endsWith('Pct')?3:1};});$('fire-charts').replaceChildren();
+  for(const c of charts){const [lo,hi]=c.originalRange;c.lo=lo;c.range=hi-lo||1;const points=rows.map(r=>`${(r[0]/data.sampling.endElapsedS*264).toFixed(2)},${(55-(r[c.index]-lo)/c.range*48).toFixed(2)}`).join(' ');const card=document.createElement('div');card.className='telemetry-card';card.style.setProperty('--trace',c.color);card.innerHTML=`<div class="telemetry-heading"><span>${esc(c.label)}</span><strong>—</strong></div><svg viewBox="0 0 264 62" role="img" aria-label="${esc(c.label)} zaman serisi"><path d="M0 7H264M0 31H264M0 55H264" class="chart-grid"/><polyline points="${points}" class="chart-line"/><line class="chart-cursor" x1="0" x2="0" y1="0" y2="62"/><circle class="chart-dot" r="3" cx="0" cy="55"/></svg><div class="chart-axis"><span>${fmt(lo,c.digits)} – ${fmt(hi,c.digits)} ${esc(c.unit)}</span><span>0–${Math.ceil(data.sampling.endElapsedS)} s</span></div>`;$('fire-charts').append(card);c.element=card;}
+ }
+ function buildEvents(){const events=record.id==='same-r55'?[{time:0,label:'Başlangıç'},{time:398,label:'Isıtıcı açık'},{time:452,label:'Isıtıcı kapalı'},{time:498,label:'Karıştırma açık'},{time:506,label:'Karıştırma kapalı'}]:[{time:0,label:'Başlangıç'},{time:60.027,label:'Ateşleyici'},{time:120,label:'Yanma görünümü'},{time:480.054,label:'Fan kapalı'}];$('timeline-events').replaceChildren(...events.map(e=>{const b=document.createElement('button');b.textContent=`${e.time?Math.round(e.time)+' s · ':''}${e.label}`;b.onclick=()=>{playing=false;t=e.time;render();};return b;}));}
+ function render(){if(!data)return;$('fire-range').value=t;$('fire-time').textContent=`${time(t)} / ${time(data.sampling.endElapsedS)}`;$('fire-play').textContent=playing?'Ⅱ Duraklat':'▶ Oynat';
+  let lo=0,hi=rows.length-1;while(lo<hi){const m=(lo+hi)>>1;if(rows[m][0]<t)lo=m+1;else hi=m;}let index=lo;if(lo>0&&Math.abs(rows[lo-1][0]-t)<Math.abs(rows[lo][0]-t))index=lo-1;const row=rows[index];currentRow=row;
+  $('fire-phase').textContent=record.id==='same-r55'?(row[5]?'Isıtıcı etkin':row[6]?'Karıştırma fanı etkin':row[7]?'Test kaydı sürüyor':'Test dışı kayıt'):(t<60.027?'Ateşleme öncesi':t<68.013?'Ateşleyici etkin':row[8]===0?'Deney fanı kapalı':'Deney kaydı · alev temsili');
+  for(const c of charts){const x=t/data.sampling.endElapsedS*264;c.element.querySelector('.chart-cursor').setAttribute('x1',x);c.element.querySelector('.chart-cursor').setAttribute('x2',x);c.element.querySelector('.chart-dot').setAttribute('cx',row[0]/data.sampling.endElapsedS*264);c.element.querySelector('.chart-dot').setAttribute('cy',55-(row[c.index]-c.lo)/c.range*48);if(lastRow!==index)c.element.querySelector('strong').textContent=`${fmt(row[c.index],c.digits)} ${c.unit}`;}
+  if(lastRow!==index){const controls=record.id==='same-r55'?[['Isıtıcı',row[5]?'Açık':'Kapalı'],['Karıştırma fanı',row[6]?'Açık':'Kapalı'],['Test numarası',row[8]],['STS alarm bayrağı',row[9]?'1':'0 · alarm yok']]:[['Hava hızı',fmt(row[6])+' cm/s'],['Ateşleyici',fmt(row[7],3)+' A'],['Fan güç komutu',row[8]===1?'Açık':'Kapalı']];$('control-readings').innerHTML=controls.map(([k,v])=>`<div><dt>${k}</dt><dd>${v}</dd></div>`).join('');$('fire-sample').textContent=`Özgün ölçüm: ${fmt(row[0],3)} s · Excel satırı ${row[1]}`;lastRow=index;}
+ }
+ return {get active(){return active;},get status(){return {id:record?.id,time:t,playing,sourceRow:currentRow?.[1],placement:placement.toArray()};},close,openCatalog:catalog.open,placeAt(center,title){placement.set(THREE.MathUtils.clamp(center[0],-2.2,2.2),-.22,THREE.MathUtils.clamp(center[2]*.3,-.33,.33));placementLabel=title+' yakını';$('placement-select').value='custom';open();},update(dt){if(!active)return;if(playing&&!document.querySelector('dialog[open]')){t=Math.min(t+dt*speed,data?.sampling.endElapsedS??0);if(data&&t>=data.sampling.endElapsedS)playing=false;render();}if(record?.id==='saffire-i-sample1')visual.update(t);if(record?.id==='same-r55')heater.material.emissiveIntensity=currentRow?.[5] ? .65 : 0;}};
 }
