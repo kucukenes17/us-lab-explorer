@@ -1,0 +1,1776 @@
+{
+  "source": "NASA/JSC/IGOAL ISS (E) Internal",
+  "source_url": "https://science.nasa.gov/3d-resources/international-space-station-iss-e-internal/",
+  "module": "US_Lab",
+  "mesh_count": 66,
+  "triangle_count": 67138,
+  "coordinate_system": "glTF Y-up, corridor along X; visually normalized units, not engineering calibrated",
+  "camera": {
+    "position": [
+      -2.85,
+      0,
+      0
+    ],
+    "target": [
+      3.1,
+      0,
+      0
+    ]
+  },
+  "navigation_bounds": {
+    "min": [
+      -3.15,
+      -0.45,
+      -0.4
+    ],
+    "max": [
+      3.15,
+      0.45,
+      0.4
+    ]
+  },
+  "mesh_bounds": {
+    "min": [
+      -4.20959,
+      -2.11591,
+      -1.49211
+    ],
+    "max": [
+      4.17353,
+      1.68628,
+      1.32427
+    ]
+  },
+  "items": [
+    {
+      "name": "CEVIS.Bike",
+      "label": "CEVIS.Bike",
+      "parent": "Cevis.Mount",
+      "bounds": {
+        "min": [
+          0.64273,
+          -0.97481,
+          -0.95379
+        ],
+        "max": [
+          1.57018,
+          -0.44811,
+          -0.37752
+        ]
+      },
+      "center": [
+        1.10645,
+        -0.71146,
+        -0.66565
+      ],
+      "materials": [
+        "USLab_Racks_03"
+      ],
+      "triangles": 1984
+    },
+    {
+      "name": "Cevis.Mount",
+      "label": "Cevis.Mount",
+      "parent": "US_Lab_Int_Structure",
+      "bounds": {
+        "min": [
+          -0.02901,
+          -0.96718,
+          -1.05865
+        ],
+        "max": [
+          1.12663,
+          0.82876,
+          -0.38722
+        ]
+      },
+      "center": [
+        0.54881,
+        -0.06921,
+        -0.72294
+      ],
+      "materials": [
+        "USLab_Racks_03"
+      ],
+      "triangles": 6092
+    },
+    {
+      "name": "EXPRESS_Racks_ATLAS_11B_Base",
+      "label": "EXPRESS 11B Base",
+      "parent": "US_Lab",
+      "bounds": {
+        "min": [
+          -0.9846,
+          -0.62138,
+          -1.49211
+        ],
+        "max": [
+          -0.02079,
+          0.97674,
+          -1.07123
+        ]
+      },
+      "center": [
+        -0.5027,
+        0.17768,
+        -1.28167
+      ],
+      "materials": [
+        "EXPRESS_Racks_ATLAS"
+      ],
+      "triangles": 34
+    },
+    {
+      "name": "EXPRESS_Racks_ATLAS_11B_Generic_Locker_01",
+      "label": "EXPRESS 11B Generic Locker 01",
+      "parent": "EXPRESS_Racks_ATLAS_11B_Base",
+      "bounds": {
+        "min": [
+          -0.98423,
+          0.57036,
+          -1.49211
+        ],
+        "max": [
+          -0.50255,
+          0.83962,
+          -1.07157
+        ]
+      },
+      "center": [
+        -0.74339,
+        0.70499,
+        -1.28184
+      ],
+      "materials": [
+        "EXPRESS_Racks_ATLAS"
+      ],
+      "triangles": 10
+    },
+    {
+      "name": "EXPRESS_Racks_ATLAS_11B_Generic_Locker_02",
+      "label": "EXPRESS 11B Generic Locker 02",
+      "parent": "EXPRESS_Racks_ATLAS_11B_Base",
+      "bounds": {
+        "min": [
+          -0.50266,
+          0.57036,
+          -1.49211
+        ],
+        "max": [
+          -0.02097,
+          0.83962,
+          -1.07157
+        ]
+      },
+      "center": [
+        -0.26182,
+        0.70499,
+        -1.28184
+      ],
+      "materials": [
+        "EXPRESS_Racks_ATLAS"
+      ],
+      "triangles": 10
+    },
+    {
+      "name": "EXPRESS_Racks_ATLAS_11B_Generic_Locker_03",
+      "label": "EXPRESS 11B Generic Locker 03",
+      "parent": "EXPRESS_Racks_ATLAS_11B_Base",
+      "bounds": {
+        "min": [
+          -0.98423,
+          0.30111,
+          -1.49211
+        ],
+        "max": [
+          -0.50255,
+          0.57037,
+          -1.07157
+        ]
+      },
+      "center": [
+        -0.74339,
+        0.43574,
+        -1.28184
+      ],
+      "materials": [
+        "EXPRESS_Racks_ATLAS"
+      ],
+      "triangles": 10
+    },
+    {
+      "name": "EXPRESS_Racks_ATLAS_11B_Generic_Locker_04",
+      "label": "EXPRESS 11B Generic Locker 04",
+      "parent": "EXPRESS_Racks_ATLAS_11B_Base",
+      "bounds": {
+        "min": [
+          -0.50266,
+          0.30111,
+          -1.49211
+        ],
+        "max": [
+          -0.02097,
+          0.57037,
+          -1.07157
+        ]
+      },
+      "center": [
+        -0.26182,
+        0.43574,
+        -1.28184
+      ],
+      "materials": [
+        "EXPRESS_Racks_ATLAS"
+      ],
+      "triangles": 10
+    },
+    {
+      "name": "EXPRESS_Racks_ATLAS_11B_Generic_Locker_05",
+      "label": "EXPRESS 11B Generic Locker 05",
+      "parent": "EXPRESS_Racks_ATLAS_11B_Base",
+      "bounds": {
+        "min": [
+          -0.98429,
+          0.03187,
+          -1.49211
+        ],
+        "max": [
+          -0.5026,
+          0.30112,
+          -1.07157
+        ]
+      },
+      "center": [
+        -0.74345,
+        0.1665,
+        -1.28184
+      ],
+      "materials": [
+        "EXPRESS_Racks_ATLAS"
+      ],
+      "triangles": 10
+    },
+    {
+      "name": "EXPRESS_Racks_ATLAS_11B_Generic_Locker_06",
+      "label": "EXPRESS 11B Generic Locker 06",
+      "parent": "EXPRESS_Racks_ATLAS_11B_Base",
+      "bounds": {
+        "min": [
+          -0.50272,
+          0.03187,
+          -1.49211
+        ],
+        "max": [
+          -0.02103,
+          0.30112,
+          -1.07157
+        ]
+      },
+      "center": [
+        -0.26187,
+        0.1665,
+        -1.28184
+      ],
+      "materials": [
+        "EXPRESS_Racks_ATLAS"
+      ],
+      "triangles": 10
+    },
+    {
+      "name": "EXPRESS_Racks_ATLAS_11B_Generic_Locker_07",
+      "label": "EXPRESS 11B Generic Locker 07",
+      "parent": "EXPRESS_Racks_ATLAS_11B_Base",
+      "bounds": {
+        "min": [
+          -0.98429,
+          -0.23738,
+          -1.49211
+        ],
+        "max": [
+          -0.5026,
+          0.03187,
+          -1.07157
+        ]
+      },
+      "center": [
+        -0.74345,
+        -0.10275,
+        -1.28184
+      ],
+      "materials": [
+        "EXPRESS_Racks_ATLAS"
+      ],
+      "triangles": 10
+    },
+    {
+      "name": "EXPRESS_Racks_ATLAS_11B_Generic_Locker_08",
+      "label": "EXPRESS 11B Generic Locker 08",
+      "parent": "EXPRESS_Racks_ATLAS_11B_Base",
+      "bounds": {
+        "min": [
+          -0.50272,
+          -0.23738,
+          -1.49211
+        ],
+        "max": [
+          -0.02103,
+          0.03187,
+          -1.07157
+        ]
+      },
+      "center": [
+        -0.26187,
+        -0.10275,
+        -1.28184
+      ],
+      "materials": [
+        "EXPRESS_Racks_ATLAS"
+      ],
+      "triangles": 10
+    },
+    {
+      "name": "EXPRESS_Racks_ATLAS_1_Base",
+      "label": "EXPRESS 1 Base",
+      "parent": "US_Lab",
+      "bounds": {
+        "min": [
+          1.14762,
+          1.07389,
+          -0.58659
+        ],
+        "max": [
+          2.11095,
+          1.49477,
+          1.01153
+        ]
+      },
+      "center": [
+        1.62928,
+        1.28433,
+        0.21247
+      ],
+      "materials": [
+        "EXPRESS_Racks_ATLAS"
+      ],
+      "triangles": 48
+    },
+    {
+      "name": "EXPRESS_Racks_ATLAS_1_Drawer_02",
+      "label": "EXPRESS 1 Drawer 02",
+      "parent": "EXPRESS_Racks_ATLAS_1_Base",
+      "bounds": {
+        "min": [
+          1.62928,
+          1.07423,
+          -0.57759
+        ],
+        "max": [
+          2.11094,
+          1.07423,
+          -0.35999
+        ]
+      },
+      "center": [
+        1.87011,
+        1.07423,
+        -0.46879
+      ],
+      "materials": [
+        "EXPRESS_Racks_ATLAS"
+      ],
+      "triangles": 2
+    },
+    {
+      "name": "EXPRESS_Racks_ATLAS_1_Glacier",
+      "label": "EXPRESS 1 Glacier",
+      "parent": "EXPRESS_Racks_ATLAS_1_Base",
+      "bounds": {
+        "min": [
+          1.14763,
+          1.07423,
+          -0.34325
+        ],
+        "max": [
+          1.62929,
+          1.49477,
+          0.19526
+        ]
+      },
+      "center": [
+        1.38846,
+        1.2845,
+        -0.074
+      ],
+      "materials": [
+        "EXPRESS_Racks_ATLAS"
+      ],
+      "triangles": 6
+    },
+    {
+      "name": "EXPRESS_Racks_ATLAS_1_Iceberg",
+      "label": "EXPRESS 1 Iceberg",
+      "parent": "EXPRESS_Racks_ATLAS_1_Base",
+      "bounds": {
+        "min": [
+          1.14763,
+          1.07423,
+          0.33591
+        ],
+        "max": [
+          1.62929,
+          1.49477,
+          0.87441
+        ]
+      },
+      "center": [
+        1.38846,
+        1.2845,
+        0.60516
+      ],
+      "materials": [
+        "EXPRESS_Racks_ATLAS"
+      ],
+      "triangles": 6
+    },
+    {
+      "name": "EXPRESS_Racks_ATLAS_1_Locker_NoDoor_01",
+      "label": "EXPRESS 1 Locker NoDoor 01",
+      "parent": "EXPRESS_Racks_ATLAS_1_Base",
+      "bounds": {
+        "min": [
+          1.62927,
+          1.07423,
+          0.60516
+        ],
+        "max": [
+          2.11094,
+          1.49477,
+          0.87441
+        ]
+      },
+      "center": [
+        1.8701,
+        1.2845,
+        0.73979
+      ],
+      "materials": [
+        "EXPRESS_Racks_ATLAS"
+      ],
+      "triangles": 42
+    },
+    {
+      "name": "EXPRESS_Racks_ATLAS_1_Locker_NoDoor_02",
+      "label": "EXPRESS 1 Locker NoDoor 02",
+      "parent": "EXPRESS_Racks_ATLAS_1_Base",
+      "bounds": {
+        "min": [
+          1.62927,
+          1.07423,
+          0.33591
+        ],
+        "max": [
+          2.11094,
+          1.49477,
+          0.60516
+        ]
+      },
+      "center": [
+        1.8701,
+        1.2845,
+        0.47054
+      ],
+      "materials": [
+        "EXPRESS_Racks_ATLAS"
+      ],
+      "triangles": 42
+    },
+    {
+      "name": "EXPRESS_Racks_ATLAS_1_Merlin",
+      "label": "EXPRESS 1 Merlin",
+      "parent": "EXPRESS_Racks_ATLAS_1_Base",
+      "bounds": {
+        "min": [
+          1.62926,
+          1.07423,
+          -0.34325
+        ],
+        "max": [
+          2.11094,
+          1.49477,
+          -0.07399
+        ]
+      },
+      "center": [
+        1.8701,
+        1.2845,
+        -0.20862
+      ],
+      "materials": [
+        "EXPRESS_Racks_ATLAS"
+      ],
+      "triangles": 10
+    },
+    {
+      "name": "EXPRESS_Racks_ATLAS_1_SAMS",
+      "label": "EXPRESS 1 SAMS",
+      "parent": "EXPRESS_Racks_ATLAS_1_Base",
+      "bounds": {
+        "min": [
+          1.14763,
+          1.07423,
+          -0.57759
+        ],
+        "max": [
+          1.62928,
+          1.07423,
+          -0.35999
+        ]
+      },
+      "center": [
+        1.38845,
+        1.07423,
+        -0.46879
+      ],
+      "materials": [
+        "EXPRESS_Racks_ATLAS"
+      ],
+      "triangles": 2
+    },
+    {
+      "name": "EXPRESS_Racks_ATLAS_2_Base",
+      "label": "EXPRESS 2 Base",
+      "parent": "US_Lab",
+      "bounds": {
+        "min": [
+          2.20347,
+          1.07389,
+          -0.58659
+        ],
+        "max": [
+          3.1668,
+          1.49477,
+          1.01153
+        ]
+      },
+      "center": [
+        2.68513,
+        1.28433,
+        0.21247
+      ],
+      "materials": [
+        "EXPRESS_Racks_ATLAS"
+      ],
+      "triangles": 48
+    },
+    {
+      "name": "EXPRESS_Racks_ATLAS_2_Drawer_01",
+      "label": "EXPRESS 2 Drawer 01",
+      "parent": "EXPRESS_Racks_ATLAS_2_Base",
+      "bounds": {
+        "min": [
+          2.68513,
+          1.07423,
+          -0.57759
+        ],
+        "max": [
+          3.16679,
+          1.07423,
+          -0.35999
+        ]
+      },
+      "center": [
+        2.92596,
+        1.07423,
+        -0.46879
+      ],
+      "materials": [
+        "EXPRESS_Racks_ATLAS"
+      ],
+      "triangles": 2
+    },
+    {
+      "name": "EXPRESS_Racks_ATLAS_2_Maritime_Awareness",
+      "label": "EXPRESS 2 Maritime Awareness",
+      "parent": "EXPRESS_Racks_ATLAS_2_Base",
+      "bounds": {
+        "min": [
+          2.20347,
+          1.07423,
+          -0.57759
+        ],
+        "max": [
+          2.68513,
+          1.07423,
+          -0.35999
+        ]
+      },
+      "center": [
+        2.4443,
+        1.07423,
+        -0.46879
+      ],
+      "materials": [
+        "EXPRESS_Racks_ATLAS"
+      ],
+      "triangles": 2
+    },
+    {
+      "name": "EXPRESS_Racks_ATLAS_2_SABL_01",
+      "label": "EXPRESS 2 SABL 01",
+      "parent": "EXPRESS_Racks_ATLAS_2_Base",
+      "bounds": {
+        "min": [
+          2.6851,
+          1.07423,
+          0.60515
+        ],
+        "max": [
+          3.16679,
+          1.49477,
+          0.87441
+        ]
+      },
+      "center": [
+        2.92595,
+        1.2845,
+        0.73978
+      ],
+      "materials": [
+        "EXPRESS_Racks_ATLAS"
+      ],
+      "triangles": 10
+    },
+    {
+      "name": "EXPRESS_Racks_ATLAS_2_SABL_02",
+      "label": "EXPRESS 2 SABL 02",
+      "parent": "EXPRESS_Racks_ATLAS_2_Base",
+      "bounds": {
+        "min": [
+          2.6851,
+          1.07423,
+          0.33591
+        ],
+        "max": [
+          3.16679,
+          1.49477,
+          0.60516
+        ]
+      },
+      "center": [
+        2.92595,
+        1.2845,
+        0.47054
+      ],
+      "materials": [
+        "EXPRESS_Racks_ATLAS"
+      ],
+      "triangles": 10
+    },
+    {
+      "name": "EXPRESS_Racks_ATLAS_2_Thermal_Amine_Scrubber",
+      "label": "EXPRESS 2 Thermal Amine Scrubber",
+      "parent": "EXPRESS_Racks_ATLAS_2_Base",
+      "bounds": {
+        "min": [
+          2.20348,
+          1.07423,
+          -0.34325
+        ],
+        "max": [
+          3.16679,
+          1.07423,
+          0.19462
+        ]
+      },
+      "center": [
+        2.68513,
+        1.07423,
+        -0.07432
+      ],
+      "materials": [
+        "EXPRESS_Racks_ATLAS"
+      ],
+      "triangles": 2
+    },
+    {
+      "name": "EXPRESS_Racks_ATLAS_6_BRIC-LED",
+      "label": "EXPRESS 6 BRIC-LED",
+      "parent": "EXPRESS_Racks_ATLAS_6_Base",
+      "bounds": {
+        "min": [
+          -0.50241,
+          1.08023,
+          0.33358
+        ],
+        "max": [
+          -0.02073,
+          1.50077,
+          0.60283
+        ]
+      },
+      "center": [
+        -0.26157,
+        1.2905,
+        0.4682
+      ],
+      "materials": [
+        "EXPRESS_Racks_ATLAS"
+      ],
+      "triangles": 10
+    },
+    {
+      "name": "EXPRESS_Racks_ATLAS_6_Base",
+      "label": "EXPRESS 6 Base",
+      "parent": "US_Lab",
+      "bounds": {
+        "min": [
+          -0.9841,
+          1.0799,
+          -0.58892
+        ],
+        "max": [
+          -0.02077,
+          1.50077,
+          1.00921
+        ]
+      },
+      "center": [
+        -0.50243,
+        1.29034,
+        0.21014
+      ],
+      "materials": [
+        "EXPRESS_Racks_ATLAS"
+      ],
+      "triangles": 48
+    },
+    {
+      "name": "EXPRESS_Racks_ATLAS_6_Drawer",
+      "label": "EXPRESS 6 Drawer",
+      "parent": "EXPRESS_Racks_ATLAS_6_Base",
+      "bounds": {
+        "min": [
+          -0.9841,
+          1.08023,
+          -0.57991
+        ],
+        "max": [
+          -0.50244,
+          1.08023,
+          -0.36232
+        ]
+      },
+      "center": [
+        -0.74327,
+        1.08023,
+        -0.47112
+      ],
+      "materials": [
+        "EXPRESS_Racks_ATLAS"
+      ],
+      "triangles": 2
+    },
+    {
+      "name": "EXPRESS_Racks_ATLAS_6_Polar",
+      "label": "EXPRESS 6 Polar",
+      "parent": "EXPRESS_Racks_ATLAS_6_Base",
+      "bounds": {
+        "min": [
+          -0.50246,
+          1.08023,
+          -0.34557
+        ],
+        "max": [
+          -0.02078,
+          1.50077,
+          -0.07632
+        ]
+      },
+      "center": [
+        -0.26162,
+        1.2905,
+        -0.21094
+      ],
+      "materials": [
+        "EXPRESS_Racks_ATLAS"
+      ],
+      "triangles": 10
+    },
+    {
+      "name": "EXPRESS_Racks_ATLAS_6_T-CMM",
+      "label": "EXPRESS 6 T-CMM",
+      "parent": "EXPRESS_Racks_ATLAS_6_Base",
+      "bounds": {
+        "min": [
+          -0.50244,
+          1.08023,
+          0.60283
+        ],
+        "max": [
+          -0.02075,
+          1.50077,
+          0.87208
+        ]
+      },
+      "center": [
+        -0.2616,
+        1.2905,
+        0.73745
+      ],
+      "materials": [
+        "EXPRESS_Racks_ATLAS"
+      ],
+      "triangles": 10
+    },
+    {
+      "name": "EXPRESS_Racks_ATLAS_7_Base",
+      "label": "EXPRESS 7 Base",
+      "parent": "US_Lab",
+      "bounds": {
+        "min": [
+          1.13747,
+          -0.62069,
+          -1.49088
+        ],
+        "max": [
+          2.10079,
+          0.97743,
+          -1.07001
+        ]
+      },
+      "center": [
+        1.61913,
+        0.17837,
+        -1.28044
+      ],
+      "materials": [
+        "EXPRESS_Racks_ATLAS"
+      ],
+      "triangles": 48
+    },
+    {
+      "name": "EXPRESS_Racks_ATLAS_7_Drawer_01",
+      "label": "EXPRESS 7 Drawer 01",
+      "parent": "EXPRESS_Racks_ATLAS_7_Base",
+      "bounds": {
+        "min": [
+          1.13747,
+          -0.61169,
+          -1.07034
+        ],
+        "max": [
+          1.61912,
+          -0.39409,
+          -1.07034
+        ]
+      },
+      "center": [
+        1.3783,
+        -0.50289,
+        -1.07034
+      ],
+      "materials": [
+        "EXPRESS_Racks_ATLAS"
+      ],
+      "triangles": 2
+    },
+    {
+      "name": "EXPRESS_Racks_ATLAS_7_Drawer_02",
+      "label": "EXPRESS 7 Drawer 02",
+      "parent": "EXPRESS_Racks_ATLAS_7_Base",
+      "bounds": {
+        "min": [
+          1.61912,
+          -0.61169,
+          -1.07034
+        ],
+        "max": [
+          2.10078,
+          -0.39409,
+          -1.07034
+        ]
+      },
+      "center": [
+        1.85995,
+        -0.50289,
+        -1.07034
+      ],
+      "materials": [
+        "EXPRESS_Racks_ATLAS"
+      ],
+      "triangles": 2
+    },
+    {
+      "name": "EXPRESS_Racks_ATLAS_BRIC-LED",
+      "label": "EXPRESS BRIC-LED",
+      "parent": "EXPRESS_Racks_ATLAS_7_Base",
+      "bounds": {
+        "min": [
+          1.61912,
+          0.30181,
+          -1.49088
+        ],
+        "max": [
+          2.10078,
+          0.57106,
+          -1.07034
+        ]
+      },
+      "center": [
+        1.85995,
+        0.43644,
+        -1.28061
+      ],
+      "materials": [
+        "EXPRESS_Racks_ATLAS"
+      ],
+      "triangles": 10
+    },
+    {
+      "name": "EXPRESS_Racks_ATLAS_CAL_Pwr._Elec.",
+      "label": "EXPRESS CAL Pwr. Elec.",
+      "parent": "EXPRESS_Racks_ATLAS_7_Base",
+      "bounds": {
+        "min": [
+          1.13747,
+          0.30181,
+          -1.49088
+        ],
+        "max": [
+          1.61913,
+          0.57106,
+          -1.07034
+        ]
+      },
+      "center": [
+        1.3783,
+        0.43644,
+        -1.28061
+      ],
+      "materials": [
+        "EXPRESS_Racks_ATLAS"
+      ],
+      "triangles": 10
+    },
+    {
+      "name": "EXPRESS_Racks_ATLAS_CAL_Sci_Instr",
+      "label": "EXPRESS CAL Sci Instr",
+      "parent": "EXPRESS_Racks_ATLAS_7_Base",
+      "bounds": {
+        "min": [
+          1.13747,
+          -0.37735,
+          -1.07034
+        ],
+        "max": [
+          2.10078,
+          0.16052,
+          -1.07034
+        ]
+      },
+      "center": [
+        1.61912,
+        -0.10842,
+        -1.07034
+      ],
+      "materials": [
+        "EXPRESS_Racks_ATLAS"
+      ],
+      "triangles": 2
+    },
+    {
+      "name": "EXPRESS_Racks_ATLAS_CGBA",
+      "label": "EXPRESS CGBA",
+      "parent": "EXPRESS_Racks_ATLAS_7_Base",
+      "bounds": {
+        "min": [
+          1.13748,
+          0.57106,
+          -1.49088
+        ],
+        "max": [
+          1.61914,
+          0.84031,
+          -1.07034
+        ]
+      },
+      "center": [
+        1.37831,
+        0.70569,
+        -1.28061
+      ],
+      "materials": [
+        "EXPRESS_Racks_ATLAS"
+      ],
+      "triangles": 10
+    },
+    {
+      "name": "EXPRESS_Racks_ATLAS_Glacier",
+      "label": "EXPRESS Glacier",
+      "parent": "EXPRESS_Racks_ATLAS_6_Base",
+      "bounds": {
+        "min": [
+          -0.9841,
+          1.08023,
+          0.33358
+        ],
+        "max": [
+          -0.50244,
+          1.50077,
+          0.87208
+        ]
+      },
+      "center": [
+        -0.74327,
+        1.2905,
+        0.60283
+      ],
+      "materials": [
+        "EXPRESS_Racks_ATLAS"
+      ],
+      "triangles": 10
+    },
+    {
+      "name": "EXPRESS_Racks_ATLAS_MUSES_MDCS",
+      "label": "EXPRESS MUSES MDCS",
+      "parent": "EXPRESS_Racks_ATLAS_6_Base",
+      "bounds": {
+        "min": [
+          -0.50244,
+          1.08023,
+          -0.57991
+        ],
+        "max": [
+          -0.02078,
+          1.08023,
+          -0.36232
+        ]
+      },
+      "center": [
+        -0.26161,
+        1.08023,
+        -0.47112
+      ],
+      "materials": [
+        "EXPRESS_Racks_ATLAS"
+      ],
+      "triangles": 2
+    },
+    {
+      "name": "EXPRESS_Racks_ATLAS_MVP",
+      "label": "EXPRESS MVP",
+      "parent": "EXPRESS_Racks_ATLAS_6_Base",
+      "bounds": {
+        "min": [
+          -0.50246,
+          1.08023,
+          -0.07632
+        ],
+        "max": [
+          -0.02078,
+          1.50077,
+          0.19293
+        ]
+      },
+      "center": [
+        -0.26162,
+        1.2905,
+        0.0583
+      ],
+      "materials": [
+        "EXPRESS_Racks_ATLAS"
+      ],
+      "triangles": 10
+    },
+    {
+      "name": "EXPRESS_Racks_ATLAS_Nanoracks Zero-G Oven",
+      "label": "EXPRESS Nanoracks Zero-G Oven",
+      "parent": "EXPRESS_Racks_ATLAS_6_Base",
+      "bounds": {
+        "min": [
+          -0.98409,
+          1.08023,
+          -0.07632
+        ],
+        "max": [
+          -0.50241,
+          1.50077,
+          0.19293
+        ]
+      },
+      "center": [
+        -0.74325,
+        1.2905,
+        0.0583
+      ],
+      "materials": [
+        "EXPRESS_Racks_ATLAS"
+      ],
+      "triangles": 10
+    },
+    {
+      "name": "EXPRESS_Racks_ATLAS_Polar",
+      "label": "EXPRESS Polar",
+      "parent": "EXPRESS_Racks_ATLAS_6_Base",
+      "bounds": {
+        "min": [
+          -0.98409,
+          1.08023,
+          -0.34557
+        ],
+        "max": [
+          -0.50241,
+          1.50077,
+          -0.07632
+        ]
+      },
+      "center": [
+        -0.74325,
+        1.2905,
+        -0.21094
+      ],
+      "materials": [
+        "EXPRESS_Racks_ATLAS"
+      ],
+      "triangles": 10
+    },
+    {
+      "name": "EXPRESS_Racks_ATLAS_T-CMM",
+      "label": "EXPRESS T-CMM",
+      "parent": "EXPRESS_Racks_ATLAS_7_Base",
+      "bounds": {
+        "min": [
+          1.61912,
+          0.57106,
+          -1.49088
+        ],
+        "max": [
+          2.1008,
+          0.84031,
+          -1.07034
+        ]
+      },
+      "center": [
+        1.85996,
+        0.70569,
+        -1.28061
+      ],
+      "materials": [
+        "EXPRESS_Racks_ATLAS"
+      ],
+      "triangles": 10
+    },
+    {
+      "name": "USLab_Patches",
+      "label": "USLab Patches",
+      "parent": "US_Lab",
+      "bounds": {
+        "min": [
+          -3.18444,
+          0.84103,
+          -0.14276
+        ],
+        "max": [
+          -3.18244,
+          1.00356,
+          0.72068
+        ]
+      },
+      "center": [
+        -3.18344,
+        0.9223,
+        0.28896
+      ],
+      "materials": [
+        "Patches1"
+      ],
+      "triangles": 581
+    },
+    {
+      "name": "US_Lab_Int_AFT_Bulkhead",
+      "label": "AFT Bulkhead",
+      "parent": "US_Lab_Int_Structure",
+      "bounds": {
+        "min": [
+          -4.20959,
+          -1.14183,
+          -1.1085
+        ],
+        "max": [
+          -3.18344,
+          1.11929,
+          1.15071
+        ]
+      },
+      "center": [
+        -3.69652,
+        -0.01127,
+        0.0211
+      ],
+      "materials": [
+        "Generic_HubAndMetals",
+        "USLab_AFT_Bulkhead"
+      ],
+      "triangles": 394
+    },
+    {
+      "name": "US_Lab_Int_Elbow_Screens",
+      "label": "Elbow Screens",
+      "parent": "US_Lab_Int_Details",
+      "bounds": {
+        "min": [
+          1.12602,
+          -0.43748,
+          0.66054
+        ],
+        "max": [
+          2.29526,
+          0.34978,
+          1.07645
+        ]
+      },
+      "center": [
+        1.71064,
+        -0.04385,
+        0.8685
+      ],
+      "materials": [
+        "Generic_HubAndMetals"
+      ],
+      "triangles": 24
+    },
+    {
+      "name": "US_Lab_Int_Elbows",
+      "label": "Elbows",
+      "parent": "US_Lab_Int_Details",
+      "bounds": {
+        "min": [
+          1.09805,
+          -0.49693,
+          0.85098
+        ],
+        "max": [
+          2.38808,
+          0.64926,
+          1.11581
+        ]
+      },
+      "center": [
+        1.74307,
+        0.07616,
+        0.9834
+      ],
+      "materials": [
+        "Generic_HubAndMetals"
+      ],
+      "triangles": 500
+    },
+    {
+      "name": "US_Lab_Int_FWD_Bulkhead",
+      "label": "FWD Bulkhead",
+      "parent": "US_Lab_Int_Structure",
+      "bounds": {
+        "min": [
+          3.23634,
+          -1.18834,
+          -1.15737
+        ],
+        "max": [
+          4.17353,
+          1.16314,
+          1.19412
+        ]
+      },
+      "center": [
+        3.70494,
+        -0.0126,
+        0.01838
+      ],
+      "materials": [
+        "Generic_HubAndMetals",
+        "USLab_FWD_Bulkhead"
+      ],
+      "triangles": 586
+    },
+    {
+      "name": "US_Lab_Int_Lights_Emissive",
+      "label": "Lights Emissive",
+      "parent": "US_Lab_Int_Structure",
+      "bounds": {
+        "min": [
+          -3.10862,
+          1.01682,
+          -1.08561
+        ],
+        "max": [
+          3.16272,
+          1.10352,
+          1.13374
+        ]
+      },
+      "center": [
+        0.02705,
+        1.06017,
+        0.02407
+      ],
+      "materials": [
+        "Generic_Lights"
+      ],
+      "triangles": 288
+    },
+    {
+      "name": "US_Lab_Int_Lights_EndCaps",
+      "label": "Lights EndCaps",
+      "parent": "US_Lab_Int_Structure",
+      "bounds": {
+        "min": [
+          -3.12293,
+          1.01681,
+          -1.08561
+        ],
+        "max": [
+          3.17704,
+          1.10352,
+          1.13375
+        ]
+      },
+      "center": [
+        0.02705,
+        1.06017,
+        0.02407
+      ],
+      "materials": [
+        "Generic_HubAndMetals"
+      ],
+      "triangles": 840
+    },
+    {
+      "name": "US_Lab_Int_MSS_AV",
+      "label": "MSS AV",
+      "parent": "US_Lab_Int_Details",
+      "bounds": {
+        "min": [
+          -2.08731,
+          -0.28832,
+          -1.06833
+        ],
+        "max": [
+          -1.04254,
+          0.62435,
+          1.09309
+        ]
+      },
+      "center": [
+        -1.56493,
+        0.16801,
+        0.01238
+      ],
+      "materials": [
+        "Generic_Misc_Details",
+        "Generic_Misc_Details_LIGHTS"
+      ],
+      "triangles": 13202
+    },
+    {
+      "name": "US_Lab_Int_MSS_AV_Wires",
+      "label": "MSS AV Wires",
+      "parent": "US_Lab_Int_Wires",
+      "bounds": {
+        "min": [
+          -3.27426,
+          -1.38245,
+          0.53263
+        ],
+        "max": [
+          3.36785,
+          1.19624,
+          1.204
+        ]
+      },
+      "center": [
+        0.04679,
+        -0.0931,
+        0.86831
+      ],
+      "materials": [
+        "Generic_HubAndMetals"
+      ],
+      "triangles": 17508
+    },
+    {
+      "name": "US_Lab_Int_MainFrame",
+      "label": "MainFrame",
+      "parent": "US_Lab_Int_Structure",
+      "bounds": {
+        "min": [
+          -3.34079,
+          -1.21887,
+          -1.18705
+        ],
+        "max": [
+          3.37859,
+          1.19667,
+          1.2285
+        ]
+      },
+      "center": [
+        0.0189,
+        -0.0111,
+        0.02072
+      ],
+      "materials": [
+        "Generic_HubAndMetals"
+      ],
+      "triangles": 146
+    },
+    {
+      "name": "US_Lab_Int_MainFrame_Lower_Port",
+      "label": "MainFrame Lower Port",
+      "parent": "US_Lab_Int_Structure",
+      "bounds": {
+        "min": [
+          -3.14407,
+          -1.15482,
+          -1.13228
+        ],
+        "max": [
+          3.19786,
+          -1.01916,
+          -0.99661
+        ]
+      },
+      "center": [
+        0.02689,
+        -1.08699,
+        -1.06445
+      ],
+      "materials": [
+        "USLab_AFT_Bulkhead"
+      ],
+      "triangles": 150
+    },
+    {
+      "name": "US_Lab_Int_MainFrame_Lower_Stbd",
+      "label": "MainFrame Lower Stbd",
+      "parent": "US_Lab_Int_Structure",
+      "bounds": {
+        "min": [
+          -3.14479,
+          -1.15979,
+          1.03386
+        ],
+        "max": [
+          3.19714,
+          -1.02413,
+          1.16952
+        ]
+      },
+      "center": [
+        0.02618,
+        -1.09196,
+        1.10169
+      ],
+      "materials": [
+        "USLab_AFT_Bulkhead"
+      ],
+      "triangles": 150
+    },
+    {
+      "name": "US_Lab_Int_MainFrame_Upper_Port",
+      "label": "MainFrame Upper Port",
+      "parent": "US_Lab_Int_Structure",
+      "bounds": {
+        "min": [
+          -3.1704,
+          1.0103,
+          -1.15626
+        ],
+        "max": [
+          3.1933,
+          1.17305,
+          -0.99425
+        ]
+      },
+      "center": [
+        0.01145,
+        1.09167,
+        -1.07526
+      ],
+      "materials": [
+        "USLab_FWD_Bulkhead"
+      ],
+      "triangles": 98
+    },
+    {
+      "name": "US_Lab_Int_MainFrame_Upper_Stbd",
+      "label": "MainFrame Upper Stbd",
+      "parent": "US_Lab_Int_Structure",
+      "bounds": {
+        "min": [
+          -3.16957,
+          1.0103,
+          1.04399
+        ],
+        "max": [
+          3.21964,
+          1.17309,
+          1.20603
+        ]
+      },
+      "center": [
+        0.02503,
+        1.0917,
+        1.12501
+      ],
+      "materials": [
+        "USLab_FWD_Bulkhead"
+      ],
+      "triangles": 106
+    },
+    {
+      "name": "US_Lab_Int_Metals_AFT",
+      "label": "Metals AFT",
+      "parent": "US_Lab_Int_Structure",
+      "bounds": {
+        "min": [
+          -4.10089,
+          -1.09315,
+          -1.16895
+        ],
+        "max": [
+          0.07158,
+          1.68628,
+          1.11937
+        ]
+      },
+      "center": [
+        -2.01465,
+        0.29656,
+        -0.02479
+      ],
+      "materials": [
+        "Generic_HubAndMetals"
+      ],
+      "triangles": 4902
+    },
+    {
+      "name": "US_Lab_Int_Metals_FWD",
+      "label": "Metals FWD",
+      "parent": "US_Lab_Int_Structure",
+      "bounds": {
+        "min": [
+          1.05433,
+          -1.09315,
+          -1.11729
+        ],
+        "max": [
+          4.06521,
+          1.68628,
+          1.15146
+        ]
+      },
+      "center": [
+        2.55977,
+        0.29656,
+        0.01709
+      ],
+      "materials": [
+        "Generic_HubAndMetals"
+      ],
+      "triangles": 5553
+    },
+    {
+      "name": "US_Lab_Int_Racks_001",
+      "label": "Racks 001",
+      "parent": "US_Lab_Int_Racks",
+      "bounds": {
+        "min": [
+          2.16342,
+          -1.2013,
+          -1.16444
+        ],
+        "max": [
+          3.22047,
+          1.17311,
+          1.23307
+        ]
+      },
+      "center": [
+        2.69195,
+        -0.01409,
+        0.03432
+      ],
+      "materials": [
+        "USLab_Racks_01",
+        "USLab_Racks_02",
+        "USLab_Racks_04"
+      ],
+      "triangles": 2720
+    },
+    {
+      "name": "US_Lab_Int_Racks_002",
+      "label": "Racks 002",
+      "parent": "US_Lab_Int_Racks",
+      "bounds": {
+        "min": [
+          1.09742,
+          -1.2013,
+          -1.16922
+        ],
+        "max": [
+          2.15234,
+          1.17311,
+          1.32427
+        ]
+      },
+      "center": [
+        1.62488,
+        -0.01409,
+        0.07753
+      ],
+      "materials": [
+        "Generic_HubAndMetals",
+        "USLab_Racks_01"
+      ],
+      "triangles": 1782
+    },
+    {
+      "name": "US_Lab_Int_Racks_003",
+      "label": "Racks 003",
+      "parent": "US_Lab_Int_Racks",
+      "bounds": {
+        "min": [
+          0.00136,
+          -2.11591,
+          -1.15609
+        ],
+        "max": [
+          1.1194,
+          1.17338,
+          1.22336
+        ]
+      },
+      "center": [
+        0.56038,
+        -0.47126,
+        0.03363
+      ],
+      "materials": [
+        "Generic_HubAndMetals",
+        "USLab_Racks_03",
+        "USLab_Racks_01",
+        "USLab_Racks_02"
+      ],
+      "triangles": 1906
+    },
+    {
+      "name": "US_Lab_Int_Racks_004",
+      "label": "Racks 004",
+      "parent": "US_Lab_Int_Racks",
+      "bounds": {
+        "min": [
+          -1.0271,
+          -1.21673,
+          -1.17045
+        ],
+        "max": [
+          0.02491,
+          1.17911,
+          1.22336
+        ]
+      },
+      "center": [
+        -0.50109,
+        -0.01881,
+        0.02646
+      ],
+      "materials": [
+        "USLab_Racks_01"
+      ],
+      "triangles": 1465
+    },
+    {
+      "name": "US_Lab_Int_Racks_005",
+      "label": "Racks 005",
+      "parent": "US_Lab_Int_Racks",
+      "bounds": {
+        "min": [
+          -2.1033,
+          -1.2013,
+          -1.16911
+        ],
+        "max": [
+          -1.03307,
+          1.15112,
+          1.22315
+        ]
+      },
+      "center": [
+        -1.56818,
+        -0.02509,
+        0.02702
+      ],
+      "materials": [
+        "Generic_HubAndMetals",
+        "Generic_Misc_Details",
+        "USLab_Racks_01",
+        "USLab_Racks_02",
+        "PMM_01"
+      ],
+      "triangles": 1829
+    },
+    {
+      "name": "US_Lab_Int_Racks_006",
+      "label": "Racks 006",
+      "parent": "US_Lab_Int_Racks",
+      "bounds": {
+        "min": [
+          -3.1738,
+          -1.20057,
+          -1.1716
+        ],
+        "max": [
+          -2.11423,
+          1.17867,
+          1.22477
+        ]
+      },
+      "center": [
+        -2.64402,
+        -0.01095,
+        0.02658
+      ],
+      "materials": [
+        "USLab_Racks_01",
+        "USLab_Racks_02"
+      ],
+      "triangles": 2566
+    },
+    {
+      "name": "WORF_Camera Mount",
+      "label": "WORF Camera Mount",
+      "parent": "US_Lab_Int_Racks_003",
+      "bounds": {
+        "min": [
+          0.09373,
+          -1.67792,
+          0.01828
+        ],
+        "max": [
+          0.4911,
+          -1.47792,
+          0.21828
+        ]
+      },
+      "center": [
+        0.29241,
+        -1.57792,
+        0.11828
+      ],
+      "materials": [
+        "Generic_HubAndMetals"
+      ],
+      "triangles": 1204
+    }
+  ]
+}
