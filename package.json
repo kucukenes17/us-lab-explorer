@@ -1,1 +1,17 @@
-{"name":"us-lab-explorer","version":"1.0.0","private":true,"type":"module","scripts":{"build":"esbuild src/main.js --bundle --minify --format=esm --outfile=dist/app.js","dev":"node server.mjs"},"dependencies":{"three":"0.181.2"},"devDependencies":{"esbuild":"0.25.12"}}
+{
+  "name": "us-lab-explorer",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "esbuild src/main.js --bundle --minify --format=esm --outfile=dist/app.js",
+    "dev": "node server.mjs",
+    "test": "node --test tests/*.test.mjs"
+  },
+  "dependencies": {
+    "three": "0.181.2"
+  },
+  "devDependencies": {
+    "esbuild": "0.25.12"
+  }
+}

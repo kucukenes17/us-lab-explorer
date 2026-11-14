@@ -1,18 +1,21 @@
-# US Lab — Orbital Explorer
+# Orbital Research — Flame in Freefall
 
-NASA'nın ISS / Destiny iç mekân modelinde gezinti ve mikro yerçekimi yanma deneyleri için araştırma arayüzü.
+NASA yanma araştırmalarını özetleyen, araştırma amacına göre sıralayan ve özgün deney tablolarını karşılaştırmaya açan araştırma merkezi. ISS / Destiny iç mekânında gezinti ve kaynak kaydı oynatma aynı uygulamaya bağlıdır.
 
 **[Canlı uygulamayı aç](https://us-lab-explorer.eneskucuk1617.chatgpt.site)**
 
 ## Özellikler
 
+- 23 kaynaklı araştırma kartı; 19 benzersiz PSI kaydı. Amaç, malzeme, geometri, koşullar, sensörler, donanım ve sınırlamalar.
+- Amaç ve anahtar kelimeye dayalı açıklanabilir sıralama; üç araştırmayı karşılaştırma ve JSON dışa aktarma.
+- Beş araştırma için kaynakta bildirilen bulgu; diğer kartlarda sonuç özeti eksikliği açık belirtilir.
+- Dokuz resmî deney tablosunda 671 kaynak satırı ve 8.546 özgün hücre; satır türü, metin ve sayısal koşul filtreleri.
+- Satır karşılaştırma, FLEX betimsel saçılım grafiği, kaynak izi, veri sözlüğü ve CSV / JSON / ZIP indirme.
+- CIR, MDCA, MSG ve Cygnus donanım ilişkileri; resmî challenge'ın 10 kaynak bağlantısı ve Dünya uygulamaları.
 - NASA modelinde 66 parçayı seçme, arama ve serbest gezinme.
-- Saffire-I, BASS-II ve SAME-R ailelerinden 12 deney kaydı.
-- Malzeme, araştırma amacı, metin ve veri türüne göre filtreleme.
-- Üç kayda kadar deney koşullarını yan yana karşılaştırma.
-- Saffire-I ve SAME-R için özgün sensör değerleriyle zaman çizelgeleri ve CSV dışa aktarma.
-- PMMA, Nomex III ve SIBAL numuneleri için dört özgün NASA videosu.
-- Temsili 3D numune yerleşimi, Saffire alev görünümü ve mobil sahne görünümü.
+- 12 adet 3D kayıt görünümü: iki sensör zaman serisi, dört özgün NASA videosu ve numune koşulları.
+
+**AI/API yorumlama katmanı kullanıcı tercihiyle ertelendi.** Mevcut sıralama kural tabanlıdır, özetler kaynaklara dayalı editoryal içeriktir. Bunlar AI/SI çıktısı veya evrensel güvenlik puanı değildir; resmî görevin SI bileşeni tamamlanmış sayılmaz. [Görev kapsamı ve kabul kontrolleri](CHALLENGE.md).
 
 ## Yerelde çalıştırma
 
@@ -23,6 +26,7 @@ git clone https://github.com/kucukenes17/us-lab-explorer.git
 cd us-lab-explorer
 npm ci
 npm run build
+npm test
 npm run dev
 ```
 
@@ -40,6 +44,13 @@ Tarayıcıda **http://127.0.0.1:4173** adresini açın. Yerel sunucu yalnız bu 
 | Paneli kapatma | Esc |
 
 ## Veri ve bilimsel kapsam
+
+Araştırma merkezi ilk açılır; 3D model arka planda hazırlanır. Veriler ve kaynak kartları için modelin bitmesini beklemek gerekmez. Araştırma ekranı açıkken 3D render döngüsü duraklatılır.
+
+671 satır, 671 bağımsız deney değildir. FLEX-2 konfigürasyon aralıkları, SAME koşul şablonları, SAME-R yaşlandırılmış ölçümler, Saffire akış referansları ve kaynak notları ayrı türlerdir. Sayısal filtreler yaklaşık ve aralık değerlerini kendiliğinden kesin sayıya dönüştürmez. Orijinal CSV'ler değişmemiştir; SHA-256 ile doğrulanır. FLEX'teki kimyasal alt indisler ve mm²/s birimi NASA/TP-2015-216046 Tablo IX ile doğrulanmış, kaynak başlıkları korunmuştur.
+
+ZIP paketi özgün CSV, normalleştirilmiş CSV/JSON, veri sözlüğü, checksum manifestosu ve modelleme rehberi içerir. FLEX modelleme görünümü başlangıç koşullarını sonuçlardan ayırır; veri sızıntısını önlemek için sönme çapı ve yanma süresi başlangıç tahmin özellikleri sayılmaz. Bir model eğitilmemiştir.
+
 
 Saffire-I Numune 1 görünümü, 20.000 özgün satırdan seçilmiş 665 kaynak örneği içerir. Her saniyeye en yakın ölçümler ve kontrol geçişlerinin özgün satırları korunur. SAME-R 55, tekrar eden zaman damgaları dahil 1.402 özgün satır içerir. Değerler yumuşatılmaz, işaretleri değiştirilmez veya sentetik sensör eğrileri üretilmez.
 
@@ -63,7 +74,10 @@ Kaynak dosya adları, bağlantılar, satır bilgileri ve SHA-256 değerleri ilgi
 
 ```text
 src/main.js           Sahne, gezinme ve parça seçimi
-src/catalog.js        Deney filtreleme ve karşılaştırma
+src/catalog.js        3D kayıt kataloğu
+src/research.js       Araştırma merkezi ve tablo arayüzü
+src/research-model.js Sıralama, filtreleme ve dışa aktarma kuralları
+tests/               Kaynak bütünlüğü ve araştırma kuralları testleri
 src/fire.js           Deney görünümü ve telemetri oynatma
 src/flame-visual.js   Temsili hacimsel alev
 dist/                Arayüz ve derlenmiş uygulama

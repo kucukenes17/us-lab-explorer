@@ -1,12 +1,12 @@
 import { createFlameVisual } from './flame-visual.js';
-import { createCatalog, loadCatalog, escapeHTML as esc, conditionValue } from './catalog.js';
+import { loadCatalog, escapeHTML as esc, conditionValue } from './catalog.js';
 import * as THREE from 'three';
 const $=id=>document.getElementById(id);
 const fmt=(n,d=1)=>Number.isFinite(n)?n.toLocaleString('tr-TR',{maximumFractionDigits:d,minimumFractionDigits:d}):'—';
 const time=t=>`${Math.floor(t/60).toString().padStart(2,'0')}:${Math.floor(t%60).toString().padStart(2,'0')}`;
 const colors=['#c6803a','#39809b','#6d8b62','#9179a5'];
 
-export function createFireExperience({scene,enter,hidePanels,travelTo,onMode,stopMovement}){
+export function createFireExperience({scene,enter,hidePanels,travelTo,onMode,stopMovement,openResearch}){
  let active=false,playing=false,t=0,speed=5,data=null,record=null,rows=[],charts=[],lastRow=-1,request=0,records=[],currentRow=null;
  const source=new THREE.Vector3(-.18,-.22,-.33),placement=source.clone();let placementLabel='Merkez · numune tepsisi';
  const visual=createFlameVisual(scene,source),sampleGroup=new THREE.Group();scene.add(sampleGroup);sampleGroup.visible=false;
@@ -15,9 +15,9 @@ export function createFireExperience({scene,enter,hidePanels,travelTo,onMode,sto
  const sample=new THREE.Mesh(new THREE.BoxGeometry(.52,.008,.22),sampleMat);sampleGroup.add(sample);
  const wick=new THREE.Mesh(new THREE.CylinderGeometry(.012,.012,.12,14),new THREE.MeshStandardMaterial({color:0xd8c7a7}));wick.position.y=.06;sampleGroup.add(wick);
  const heater=new THREE.Mesh(new THREE.TorusGeometry(.045,.004,6,32),new THREE.MeshStandardMaterial({color:0x665f55,emissive:0xd65214,emissiveIntensity:0,metalness:.6,roughness:.5}));heater.rotation.x=Math.PI/2;heater.position.y=.02;sampleGroup.add(heater);
- const catalog=createCatalog({onSelect:r=>open(r),onOpen:()=>{playing=false;stopMovement();$('record-metadata').querySelector('video')?.pause();},onClose:()=>{}});
+ const catalog={open:focus=>{playing=false;stopMovement();$('record-metadata').querySelector('video')?.pause();openResearch(focus);}};
  const expand=document.createElement('button');expand.id='scene-expand';expand.textContent='Sahneyi büyüt';expand.setAttribute('aria-expanded','false');expand.onclick=()=>{const wide=document.body.classList.toggle('expanded-scene');expand.textContent=wide?'Verileri aç':'Sahneyi büyüt';expand.setAttribute('aria-expanded',String(wide));};$('fire-context').append(expand);
- $('research-button').onclick=()=>catalog.open();$('welcome-research').onclick=()=>catalog.open();
+
  $('lab-button').onclick=()=>{close();enter();};$('fire-button').onclick=()=>active?close():open();$('fire-close').onclick=close;
  $('experiment-select').onchange=e=>open(records.find(r=>r.id===e.target.value));
  const tabs=['data','conditions','source'];
@@ -63,5 +63,5 @@ export function createFireExperience({scene,enter,hidePanels,travelTo,onMode,sto
   for(const c of charts){const x=t/data.sampling.endElapsedS*264;c.element.querySelector('.chart-cursor').setAttribute('x1',x);c.element.querySelector('.chart-cursor').setAttribute('x2',x);c.element.querySelector('.chart-dot').setAttribute('cx',row[0]/data.sampling.endElapsedS*264);c.element.querySelector('.chart-dot').setAttribute('cy',55-(row[c.index]-c.lo)/c.range*48);if(lastRow!==index)c.element.querySelector('strong').textContent=`${fmt(row[c.index],c.digits)} ${c.unit}`;}
   if(lastRow!==index){const controls=record.id==='same-r55'?[['Isıtıcı',row[5]?'Açık':'Kapalı'],['Karıştırma fanı',row[6]?'Açık':'Kapalı'],['Test numarası',row[8]],['STS alarm bayrağı',row[9]?'1':'0 · alarm yok']]:[['Hava hızı',fmt(row[6])+' cm/s'],['Ateşleyici',fmt(row[7],3)+' A'],['Fan güç komutu',row[8]===1?'Açık':'Kapalı']];$('control-readings').innerHTML=controls.map(([k,v])=>`<div><dt>${k}</dt><dd>${v}</dd></div>`).join('');$('fire-sample').textContent=`Özgün ölçüm: ${fmt(row[0],3)} s · Excel satırı ${row[1]}`;lastRow=index;}
  }
- return {get active(){return active;},get status(){return {id:record?.id,time:t,playing,sourceRow:currentRow?.[1],placement:placement.toArray()};},close,openCatalog:catalog.open,placeAt(center,title){placement.set(THREE.MathUtils.clamp(center[0],-2.2,2.2),-.22,THREE.MathUtils.clamp(center[2]*.3,-.33,.33));placementLabel=title+' yakını';$('placement-select').value='custom';open();},update(dt){if(!active)return;if(playing&&!document.querySelector('dialog[open]')){t=Math.min(t+dt*speed,data?.sampling.endElapsedS??0);if(data&&t>=data.sampling.endElapsedS)playing=false;render();}if(record?.id==='saffire-i-sample1')visual.update(t);if(record?.id==='same-r55')heater.material.emissiveIntensity=currentRow?.[5] ? .65 : 0;}};
+ return {get active(){return active;},get status(){return {id:record?.id,time:t,playing,sourceRow:currentRow?.[1],placement:placement.toArray()};},close,openRecord:open,pause(){playing=false;stopMovement();$('record-metadata').querySelector('video')?.pause();},openCatalog:catalog.open,placeAt(center,title){placement.set(THREE.MathUtils.clamp(center[0],-2.2,2.2),-.22,THREE.MathUtils.clamp(center[2]*.3,-.33,.33));placementLabel=title+' yakını';$('placement-select').value='custom';open();},update(dt){if(!active)return;if(playing&&!document.querySelector('dialog[open]')){t=Math.min(t+dt*speed,data?.sampling.endElapsedS??0);if(data&&t>=data.sampling.endElapsedS)playing=false;render();}if(record?.id==='saffire-i-sample1')visual.update(t);if(record?.id==='same-r55')heater.material.emissiveIntensity=currentRow?.[5] ? .65 : 0;}};
 }

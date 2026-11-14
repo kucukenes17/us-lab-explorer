@@ -1,3 +1,4 @@
+import { createResearchWorkspace } from './research.js';
 import { createFireExperience } from './fire.js';
 import { GTAOPass } from 'three/addons/postprocessing/GTAOPass.js';
 import * as THREE from 'three';
@@ -196,7 +197,7 @@ function resize(){if(!renderer||!composer)return;if(ao)ao.enabled=state.quality=
 window.addEventListener('resize',resize);
 new ResizeObserver(resize).observe($('viewport'));
 
-function frame(now){requestAnimationFrame(frame);const elapsed=(now-lastFrame)/1000;const dt=Math.min(elapsed,.045);lastFrame=now;if(document.hidden||!state.ready)return;updateMotion(dt);
+function frame(now){requestAnimationFrame(frame);const elapsed=(now-lastFrame)/1000;const dt=Math.min(elapsed,.045);lastFrame=now;if(document.hidden||!state.ready||$('research-dialog').open)return;updateMotion(dt);
  if(state.selected&&state.entered){const p=state.selected.userData.center.clone().project(camera);const rect=$('viewport').getBoundingClientRect();const visible=p.z>-1&&p.z<1&&Math.abs(p.x)<1&&Math.abs(p.y)<1;$('selection-pin').hidden=!visible;if(visible){$('selection-pin').style.left=`${rect.left+(p.x*.5+.5)*rect.width}px`;$('selection-pin').style.top=`${rect.top+(-p.y*.5+.5)*rect.height}px`;}}
  fire?.update(elapsed,camera);composer.render();
 }
@@ -241,11 +242,15 @@ async function init(){
   scene.add(gltf.scene);scene.updateMatrixWorld(true);camera.updateMatrixWorld(true);
   if(meshes.length<10)throw new Error('Model parçaları okunamadı.');
   $('part-count').textContent=String(parts.length);makeStops();setupPointer();$('load-progress').style.width='100%';$('load-status').textContent='Son ayrıntılar hazırlanıyor';
-  fire=createFireExperience({scene,enter,travelTo,stopMovement,hidePanels:()=>{closeSelection();setRoute(false);$('inventory').hidden=true;},onMode:active=>{document.body.classList.toggle('fire-mode',active);ao.enabled=!active&&state.quality==='high';}});
-  await renderer.compileAsync(scene,camera);composer.render();state.ready=true;$('loading').hidden=true;$('welcome').hidden=false;requestAnimationFrame(frame);
+  fire=createFireExperience({scene,enter,travelTo,stopMovement,openResearch:focus=>research.open(focus),hidePanels:()=>{closeSelection();setRoute(false);$('inventory').hidden=true;},onMode:active=>{document.body.classList.toggle('fire-mode',active);ao.enabled=!active&&state.quality==='high';}});
+  await renderer.compileAsync(scene,camera);composer.render();state.ready=true;$('loading').hidden=true;$('welcome').hidden=false;requestAnimationFrame(frame);if(pendingReplay){fire.openRecord(pendingReplay);pendingReplay=null;}else if(pendingExplore)enter();
   // A compact read-only status lets diagnostics verify the loaded asset without exposing controls.
-  Object.defineProperty(window,'explorerStatus',{get:()=>({ready:state.ready,entered:state.entered,partCount:parts.length,meshCount:meshes.length,selected:state.selected?.userData.sourceName??null,position:camera.position.toArray(),quality:state.quality,experiment:fire.status,materials:[...new Set(meshes.flatMap(m=>Array.isArray(m.material)?m.material:[m.material]))].map(m=>({name:m.name,transparent:m.transparent,alphaTest:m.alphaTest,depthWrite:m.depthWrite}))})});
+  Object.defineProperty(window,'explorerStatus',{get:()=>({ready:state.ready,entered:state.entered,partCount:parts.length,meshCount:meshes.length,selected:state.selected?.userData.sourceName??null,position:camera.position.toArray(),quality:state.quality,experiment:fire.status,research:research.status,materials:[...new Set(meshes.flatMap(m=>Array.isArray(m.material)?m.material:[m.material]))].map(m=>({name:m.name,transparent:m.transparent,alphaTest:m.alphaTest,depthWrite:m.depthWrite}))})});
  }catch(error){console.error('US Lab initialization:',error);showError(error.message?.includes('WebGL')?'Bu cihazda WebGL açılamadı. Donanım hızlandırması olan güncel bir tarayıcıyla deneyebilirsin.':'İç mekân yüklenemedi. Bağlantını kontrol edip yeniden deneyebilirsin.');}
 }
 function showError(message){$('loading').hidden=false;$('loading').querySelector('h1').textContent='Keşfe kısa bir ara.';$('load-status').textContent=message;$('retry-button').hidden=false;$('retry-button').style.marginTop='25px';}
+let pendingReplay=null,pendingExplore=false;
+const research=createResearchWorkspace({onExplore:()=>{if(state.ready){fire?.close();enter();}else pendingExplore=true;},onReplay:record=>{if(state.ready)fire.openRecord(record);else pendingReplay=record;},onOpen:()=>{stopMovement();fire?.pause();}});
+$('research-button').onclick=()=>research.open();$('welcome-research').onclick=()=>research.open();
+research.open();
 init();
