@@ -1,62 +1,75 @@
 # US Lab — Orbital Explorer
 
-NASA ISS iç mekân modelinin Destiny / US Lab bölümü üzerinde çalışan tarayıcı keşfi.
+NASA'nın ISS / Destiny iç mekân modelinde gezinti ve mikro yerçekimi yanma deneyleri için araştırma arayüzü.
 
-## Çalıştırma
+**[Canlı uygulamayı aç](https://us-lab-explorer.eneskucuk1617.chatgpt.site)**
 
-Node.js ile `npm ci`, `npm run build`, `npm run dev`; ardından http://127.0.0.1:4173 adresini açın.
+## Özellikler
+
+- NASA modelinde 66 parçayı seçme, arama ve serbest gezinme.
+- Saffire-I, BASS-II ve SAME-R ailelerinden 12 deney kaydı.
+- Malzeme, araştırma amacı, metin ve veri türüne göre filtreleme.
+- Üç kayda kadar deney koşullarını yan yana karşılaştırma.
+- Saffire-I ve SAME-R için özgün sensör değerleriyle zaman çizelgeleri ve CSV dışa aktarma.
+- PMMA, Nomex III ve SIBAL numuneleri için dört özgün NASA videosu.
+- Temsili 3D numune yerleşimi, Saffire alev görünümü ve mobil sahne görünümü.
+
+## Yerelde çalıştırma
+
+Node.js ve npm gerekir. Kaynak kod ve tarayıcıya hazır varlıklar depoda bulunur.
+
+```sh
+git clone https://github.com/kucukenes17/us-lab-explorer.git
+cd us-lab-explorer
+npm ci
+npm run build
+npm run dev
+```
+
+Tarayıcıda **http://127.0.0.1:4173** adresini açın. Yerel sunucu yalnız bu bilgisayardan erişilebilir.
 
 ## Kontroller
 
-- Fareyi / parmağı sürükle: bakış
-- WASD veya yön tuşları: yatay hareket
-- Q / E: alçal / yüksel
-- Tıkla: parçayı seç
-- R: başlangıç; Esc: seçim ve listeyi kapat
-- Ekrandaki düğmeleri basılı tutarak da hareket edilebilir.
+| Eylem | Kontrol |
+| --- | --- |
+| Etrafa bakma | Fare veya parmakla sürükleme |
+| Yatay hareket | WASD, yön tuşları veya ekrandaki düğmeler |
+| Alçalma / yükselme | Q / E |
+| Parça seçme | Parçaya tıklama |
+| Başlangıca dönme | R |
+| Paneli kapatma | Esc |
 
-## Kaynak ve kapsam
+## Veri ve bilimsel kapsam
 
-Model: NASA / Johnson Space Center / IGOAL, ISS E Internal.
-https://science.nasa.gov/3d-resources/international-space-station-iss-e-internal/
+Saffire-I Numune 1 görünümü, 20.000 özgün satırdan seçilmiş 665 kaynak örneği içerir. Her saniyeye en yakın ölçümler ve kontrol geçişlerinin özgün satırları korunur. SAME-R 55, tekrar eden zaman damgaları dahil 1.402 özgün satır içerir. Değerler yumuşatılmaz, işaretleri değiştirilmez veya sentetik sensör eğrileri üretilmez.
 
-66 özgün parça, 67.138 üçgen. Bazı parçaların birden fazla malzemesi olduğu için GPU tarafında 80 mesh oluşur; seçim ve envanter 66 özgün kimliği korur. GLB yaklaşık 43,95 MB. Renk dokuları özgün 4K çözünürlüğündedir; normal/metalness dokuları 2K kayıpsız PNG olarak korunur. Kaynak arşivdeki eksik Generic_Misc_Details atlas bağlantısı onarıldı. Koordinatlar görsel gezinme birimleridir, mühendislik ölçüsü değildir.
+BASS kayıtları deney koşullarını içerir; dört kayıtta NASA videosu da vardır. Fan/hava gösterge notlarının birimleri ve geçiş zamanları kaynakta belirtilmediğinde tahmin edilmez. SAME-R karıştırma fanı, deney haznesine aittir. Video ve deney tablosu arasındaki tarih farkları açıklanır; videolar telemetriyle eşzamanlı kabul edilmez.
 
-Bu sürüm keşif, parça seçimi, Saffire-I gerçek ölçüm oynatıcısı, temsili alev/duman ve araştırma rehberi içerir. Doğrulanmış yangın fiziği veya eğitilmiş tahmin modeli içermez. Gerçek fiziksel malzeme özellikleri görsel doku adlarından çıkarılmamalıdır.
+3D yanma, numune boyutu ve US Lab içindeki yerleşim **temsili görselleştirmedir**. Bu proje doğrulanmış CFD, yangın yayılımı, söndürme başarısı veya eğitilmiş erken uyarı modeli sunmaz. Saffire deneyi Cygnus'ta yürütüldü. NASA iç mekân modeli fiziksel malzeme envanteri sağlamaz; görsel doku adları gerçek kimyasal bileşim sayılmaz.
 
-## Yapı
+Ek ayrıntılar: [EXPERIMENTS.md](EXPERIMENTS.md).
 
-- `src/main.js`: Three.js sahne, kamera, seçim, hareket ve UI bağlantıları
-- `dist/index.html`, `dist/style.css`: arayüz
-- `dist/assets/us-lab.asset.json` ve `us-lab.part*.bin`: kayıpsız bölünmüş NASA modülü; tarayıcıda birleştirilir
-- `dist/assets/us-lab-metadata.json`: kaynak parça adları ve görsel sınırlar
-- `.openai/hosting.json`: özel Sites yayını
+## Kaynaklar ve atıflar
 
-## Doğrulama
+- [ISS E Internal 3D modeli — NASA / JSC / IGOAL](https://science.nasa.gov/3d-resources/international-space-station-iss-e-internal/)
+- [Saffire-I — NASA PSI-98](https://psi.nasa.gov/physci/repo/data/investigations/PSI-98)
+- [BASS-II — NASA PSI-25](https://psi.nasa.gov/physci/repo/data/investigations/PSI-25)
+- [SAME-R — NASA PSI-101](https://psi.nasa.gov/physci/repo/data/investigations/PSI-101)
+- [Saffire-I görsel referansı](https://www.nasa.gov/image-article/fiberglass-composite/)
 
-Tarayıcıda yükleme, rehberli bakış, 66 parçalık arama, çok malzemeli parça seçimi, seçim sonrası klavye odağı ve arama alanından Esc kontrol edildi. 390×844 ve 844×390 ekranlarda taşma ve panel erişimi kontrol edildi. Serbest hareket konum değişimi doğrulandı. Görsel kaliteye yönelik ışık ayarı yapıldı. Cihaz performansı donanıma göre değişebilir; Dengeli kalite seçeneği bulunur.
+Kaynak dosya adları, bağlantılar, satır bilgileri ve SHA-256 değerleri ilgili JSON dosyalarında bulunur. NASA modelinin özgün geometrisi korunmuş; dokular web için hazırlanmıştır. Yaklaşık 44 MB GLB, kayıpsız üç parçaya bölünmüştür ve tarayıcıda birleştirilir. Video dosyaları özgün halleriyle sunulur. Bağımsız bir projedir; NASA tarafından onaylanmış değildir. Üçüncü taraf varlıkların kaynak atıfları korunmalıdır.
 
+## Proje yapısı
 
-## Yangın ve veriler
+```text
+src/main.js           Sahne, gezinme ve parça seçimi
+src/catalog.js        Deney filtreleme ve karşılaştırma
+src/fire.js           Deney görünümü ve telemetri oynatma
+src/flame-visual.js   Temsili hacimsel alev
+dist/                Arayüz ve derlenmiş uygulama
+dist/assets/         Model parçaları, deney JSON dosyaları ve videolar
+server.mjs           Yerel statik sunucu
+.openai/hosting.json  Mevcut Sites yayınının yapılandırması
+```
 
-Üst menüden **Yangın & veriler** açılır. Kayıt başlangıcından 659,967 saniyeye kadar oynatma, duraklatma,1×/5×/10× hız, sürükleme ve olaylara atlama vardır. Grafikler numuneTC9/sıcak gazTC3 sıcaklığı, O₂ ve CO₂ sensörleridir; hava hızı, ateşleyici akımı ve fan komutu da gösterilir. Kaynak Excel satırı ve gerçek ölçüm zamanı her seçime eşlik eder. Görüntülenen veri CSV olarak indirilebilir.
-
-`dist/assets/saffire-scenario.json`, NASA PSI-98 Saffire-I Numune1 Calibrated Data sayfasından gelen665 özgün satır içerir. Yaklaşık1Hz en yakın özgün örnekler ve ateşleyici/fan olaylarının tam geçiş satırları korunur. Ortalama, yumuşatma, interpolasyon veya değer normalizasyonu yoktur. Orijinal dosyanın SHA256 değeri JSON içinde bulunur. İlgili kaynak20.000 satırdır. Bu seyrek görünüm kısa süreli tepe değerlerinin veya alarm eşiklerinin doğrulanması için kullanılamaz.
-
-- Ateşleyici açık:60,027s; bu ilk görünür alevin bağımsız olarak doğrulanmış zamanı değildir.
-- Ateşleyici ilk kapalı örnek:68,013s; son enerjili örnek67,980s.
-- Deney fanı güç komutu kapalı:480,054s; anlık tam sönme iddiası değildir.
-- Deney Cygnus'ta yapıldı. US Lab'daki sahne ve alev/duman hareketi temsili animasyondur; hesaplanmış kabin yangını değildir. Görsel alev zarfı sensör sıcaklığından çıkarılmaz.
-
-## Yarışma kapsamı
-
-Görev metni; yanma araştırmalarını özetleyen, sıralayan ve yorumlayan bilimsel dashboard ister.3D keşif bunun bağlamsal arayüzüdür. Araştırmalar bölümü Saffire/BASS/SAME/FLEX'i amaç, ortam, koşullar, ölçümler ve sınırlamalarla sunar. Önleme/tespit/söndürme sıralaması açıklanmış konu eşleştirmesine dayanır; AI puanı değildir. Bu aşamada yalnız Saffire-I zaman serisi entegredir. Kaynaklara bağlı AI yorumlama, çoklu deneylerin sayısal karşılaştırması ve tahmin modelleri henüz uygulanmamıştır.
-
-## Bu sürümün kontrolleri
-
-665 kayıt satırındaki5.320 sayısal alan özgün workbook XML değerleriyle eşleştirildi. Olay geçişlerinde akım/fan durumu ayrıca kontrol edildi. Yeni GLB'nin66 parçası ve tüm POSITION verileri önceki geometriyle birebir aynı. Tarayıcıda zaman atlama, olay ölçümleri, araştırma sıralaması ve küçük ekran panel erişimi kontrol edildi.43,95MB yüksek çözünürlüklü modelin ilk yüklemesi bağlantıya ve cihaza göre değişir.
-
-
-## Alev görünümü revizyonu
-
-Önceki kameraya dönük ışık katmanları kaldırıldı. Yerine numuneye bağlı üç boyutlu hacim içinde çizilen, kumaş üzerinde ilerleyen dalgalı bir yanma cephesi; dokuma, kömürleşme ve yüzeye bağlı kor noktaları eklendi. Perspektif değiştiğinde alev numunede kalır. Görsel referans NASA Saffire-I fotoğrafıdır: https://www.nasa.gov/image-article/fiberglass-composite/ . İlerleme hızı ve alev şekli sanatsal temsildir; fotoğraf/veri üzerinden kalibre edilmiş fizik modeli değildir.
+Three.js ve esbuild kullanılır. API anahtarı veya veritabanı kurulumu gerekmez. Üretim için `npm run build` sonrasında `dist/` klasörü statik olarak sunulabilir.
